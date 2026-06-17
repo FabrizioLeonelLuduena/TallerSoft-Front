@@ -1,0 +1,124 @@
+<div class="asistente-page">
+
+  <!-- HEADER BAR -->
+  <div class="asistente-header">
+    <div class="header-left">
+      <div class="avatar-bot">
+        <mat-icon>smart_toy</mat-icon>
+        <span class="avatar-status-dot"></span>
+      </div>
+      <div class="header-meta">
+        <h1 class="header-title">Asistente IA</h1>
+        <span class="header-status">
+          <span class="status-dot"></span>
+          En línea · Tiempo real
+        </span>
+      </div>
+    </div>
+    <p class="header-desc">
+      Consultá el estado de tu taller en lenguaje natural
+    </p>
+  </div>
+
+  <!-- MENSAJES -->
+  <div class="mensajes-area" #mensajesContainer>
+
+    <!-- Estado vacío con sugerencias -->
+    <div class="empty-state" *ngIf="mensajes.length === 1 && !cargando">
+      <div class="empty-icon">
+        <mat-icon>auto_awesome</mat-icon>
+      </div>
+      <p class="empty-hint">Empezá con una pregunta o usá una sugerencia</p>
+      <div class="sugerencias-grid">
+        <button
+          class="sugerencia-chip"
+          *ngFor="let s of sugerencias"
+          (click)="usarSugerencia(s)"
+          [disabled]="cargando">
+          <mat-icon>lightbulb_outline</mat-icon>
+          <span>{{ s }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensajes de la conversación -->
+    <ng-container *ngFor="let m of mensajes">
+      <!-- Mensaje del asistente (salto del greeting si estamos en empty state) -->
+      <div
+        class="mensaje-row"
+        [class.row--asistente]="m.rol === 'asistente'"
+        [class.row--usuario]="m.rol === 'usuario'"
+        *ngIf="!(mensajes.length === 1 && m.rol === 'asistente')">
+
+        <div class="msg-avatar" *ngIf="m.rol === 'asistente'">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+
+        <div class="msg-bubble" [class.bubble--asistente]="m.rol === 'asistente'" [class.bubble--usuario]="m.rol === 'usuario'">
+          <p class="msg-texto">{{ m.texto }}</p>
+          <span class="msg-time">{{ m.timestamp | date:'HH:mm' }}</span>
+        </div>
+
+        <div class="msg-avatar msg-avatar--user" *ngIf="m.rol === 'usuario'">
+          <mat-icon>person</mat-icon>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Typing indicator -->
+    <div class="mensaje-row row--asistente" *ngIf="cargando">
+      <div class="msg-avatar">
+        <mat-icon>smart_toy</mat-icon>
+      </div>
+      <div class="msg-bubble bubble--asistente bubble--typing">
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sugerencias inline cuando ya hay conversación -->
+    <div class="sugerencias-inline" *ngIf="mensajes.length > 1 && !cargando">
+      <button
+        class="sugerencia-inline-chip"
+        *ngFor="let s of sugerencias"
+        (click)="usarSugerencia(s)"
+        [disabled]="cargando">
+        {{ s }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-bar">
+    <div class="input-wrapper" [class.input-wrapper--focus]="inputFocused">
+      <textarea
+        class="input-texto"
+        [(ngModel)]="preguntaActual"
+        (keydown)="onKeydown($event)"
+        (focus)="inputFocused = true"
+        (blur)="inputFocused = false"
+        [disabled]="cargando"
+        placeholder="Escribí tu pregunta... (Enter para enviar, Shift+Enter para nueva línea)"
+        rows="1"
+        maxlength="500">
+      </textarea>
+      <div class="input-actions">
+        <span class="char-count" [class.char-count--warn]="preguntaActual.length > 400">
+          {{ preguntaActual.length }}/500
+        </span>
+        <button
+          class="btn-enviar"
+          (click)="enviar()"
+          [disabled]="!preguntaActual.trim() || cargando"
+          [class.btn-enviar--active]="preguntaActual.trim() && !cargando"
+          title="Enviar (Enter)">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+    <p class="input-hint">TallerSoft IA puede cometer errores. Verificá la información importante.</p>
+  </div>
+
+</div>

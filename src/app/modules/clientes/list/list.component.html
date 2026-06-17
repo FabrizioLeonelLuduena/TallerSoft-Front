@@ -1,0 +1,156 @@
+<div class="clientes-container page-enter">
+  <!-- Search & Filter Bar -->
+  <div class="search-filter-bar">
+    <div class="search-input-wrapper">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input 
+        type="text"
+        class="ts-input search-input"
+        placeholder="Buscar clientes"
+        [value]="searchTerm"
+        (input)="onSearch($event)"
+      />
+    </div>
+    <button
+      class="btn-create"
+      (click)="onCreateClick()"
+      type="button"
+      title="Nuevo Cliente"
+    >
+      <span>+</span>
+    </button>
+  </div>
+
+  <!-- Skeleton Loaders -->
+  <div class="clients-grid" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="skeleton-avatar"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-name"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clients Grid -->
+  <div class="clients-grid" *ngIf="!isLoading && clientesActivos.length > 0">
+    <div
+      class="glass-panel client-card card-enter"
+      *ngFor="let cliente of pagedClientes; let i = index"
+      (click)="navigateToClient(cliente.id)"
+      [style.animation-delay]="(i * 40) + 'ms'"
+    >
+      <div class="card-header">
+        <div class="client-avatar">
+          {{ getInitials(cliente.nombre) }}
+        </div>
+        <div class="client-info">
+          <h3 class="client-name">{{ cliente.nombre }}</h3>
+        </div>
+      </div>
+
+      <div class="card-contacts">
+        <div class="contact-item" *ngIf="cliente.telefono">
+          <span class="material-symbols-outlined">call</span>
+          <span>{{ cliente.telefono }}</span>
+        </div>
+        <div class="contact-item" *ngIf="cliente.email">
+          <span class="material-symbols-outlined">mail</span>
+          <span class="truncate">{{ cliente.email }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button 
+          class="details-link"
+          [routerLink]="['/clientes', cliente.id]"
+          (click)="$event.stopPropagation()"
+        >
+          Detalles
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination (active clients) -->
+  <div *ngIf="!isLoading && totalPages > 1" class="pagination-controls">
+    <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <span class="pag-label">Página {{ currentPage }} de {{ totalPages }}</span>
+    <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+    <span class="pag-count">{{ pageStart }}–{{ pageEnd }} de {{ clientesActivos.length }}</span>
+  </div>
+
+  <!-- Inactive Clients Section -->
+  <div class="section-inactivos" *ngIf="!isLoading && clientesInactivos.length > 0">
+    <div class="section-divider">
+      <span class="material-symbols-outlined">archive</span>
+      Clientes inactivos ({{ clientesInactivos.length }})
+    </div>
+    <div class="clients-grid">
+      <div
+        class="glass-panel client-card client-card--inactivo card-enter"
+        *ngFor="let cliente of clientesInactivos; let i = index"
+        (click)="navigateToClient(cliente.id)"
+        [style.animation-delay]="(i * 40) + 'ms'"
+      >
+        <div class="card-header">
+          <div class="client-avatar client-avatar--inactivo">
+            {{ getInitials(cliente.nombre) }}
+          </div>
+          <div class="client-info">
+            <h3 class="client-name">{{ cliente.nombre }}</h3>
+            <span class="badge-inactivo">Inactivo</span>
+          </div>
+        </div>
+        <div class="card-contacts">
+          <div class="contact-item" *ngIf="cliente.telefono">
+            <span class="material-symbols-outlined">call</span>
+            <span>{{ cliente.telefono }}</span>
+          </div>
+          <div class="contact-item" *ngIf="cliente.email">
+            <span class="material-symbols-outlined">mail</span>
+            <span class="truncate">{{ cliente.email }}</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            class="details-link"
+            [routerLink]="['/clientes', cliente.id]"
+            (click)="$event.stopPropagation()"
+          >
+            Detalles
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && clientes.length === 0">
+    <div class="empty-icon">
+      <span class="material-symbols-outlined">groups</span>
+    </div>
+    <h3 class="empty-title">No se encontraron clientes</h3>
+    <p class="empty-text" *ngIf="searchTerm">
+      Intentá con otro nombre o filtro
+    </p>
+    <p class="empty-text" *ngIf="!searchTerm">
+      Comienza agregando tu primer cliente
+    </p>
+    <button 
+      class="ts-btn-primary"
+      routerLink="/clientes/nuevo"
+      *ngIf="!searchTerm"
+    >
+      <span class="material-symbols-outlined">person_add</span>
+      <span>Agregar primer cliente</span>
+    </button>
+  </div>
+</div>

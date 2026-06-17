@@ -1,0 +1,148 @@
+<div class="kanban-wrapper">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="skeleton-row">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Kanban Board -->
+  <div class="kanban-board" *ngIf="!isLoading" cdkDropListGroup>
+    <!-- Pendiente Column -->
+    <div class="kanban-column pendiente">
+      <div class="column-header">
+        <div class="header-label">
+          <span class="header-dot"></span>
+          Pendiente
+        </div>
+        <span class="column-count">{{ columns[0].ordenes.length }}</span>
+      </div>
+      <div cdkDropList id="PENDIENTE" [cdkDropListData]="columns[0].ordenes" (cdkDropListDropped)="onDrop($event)" class="cdk-drop-list">
+        <div class="kanban-card pending" cdkDrag *ngFor="let orden of columns[0].ordenes; trackBy: trackByOrdenId" (click)="navigateToDetail(orden.id)">
+          <div class="card-header">
+            <div class="client-name">#{{ padOrderId(orden.id) }} • {{ orden.clienteNombre }}</div>
+            <span class="prioridad-chip" [style.color]="getPrioridadColor(orden.prioridad)">{{ orden.prioridad }}</span>
+          </div>
+          <div class="card-equipment">Equipo {{ orden.equipoId }}</div>
+          <div class="card-divider"></div>
+          <div class="card-falla">{{ orden.fallaReportada }}</div>
+          <div class="card-footer">
+            <div class="tecnico-info">
+              <div class="tecnico-avatar">{{ getTecnicoInitials(orden.tecnicoNombre) }}</div>
+              <span>{{ orden.tecnicoNombre || 'Sin asignar' }}</span>
+            </div>
+            <span>{{ getRelativeTime(orden.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="empty-column" *ngIf="columns[0].ordenes.length === 0">
+          Arrastrá órdenes aquí
+        </div>
+      </div>
+    </div>
+
+    <!-- En Proceso Column -->
+    <div class="kanban-column en-proceso">
+      <div class="column-header">
+        <div class="header-label">
+          <span class="header-dot"></span>
+          En Proceso
+        </div>
+        <span class="column-count">{{ columns[1].ordenes.length }}</span>
+      </div>
+      <div cdkDropList id="EN_PROCESO" [cdkDropListData]="columns[1].ordenes" (cdkDropListDropped)="onDrop($event)" class="cdk-drop-list">
+        <div class="kanban-card processing" cdkDrag *ngFor="let orden of columns[1].ordenes; trackBy: trackByOrdenId" (click)="navigateToDetail(orden.id)">
+          <div class="card-header">
+            <div class="client-name">#{{ padOrderId(orden.id) }} • {{ orden.clienteNombre }}</div>
+            <span class="prioridad-chip" [style.color]="getPrioridadColor(orden.prioridad)">{{ orden.prioridad }}</span>
+          </div>
+          <div class="card-equipment">Equipo {{ orden.equipoId }}</div>
+          <div class="card-divider"></div>
+          <div class="card-falla">{{ orden.fallaReportada }}</div>
+          <div class="card-footer">
+            <div class="tecnico-info">
+              <div class="tecnico-avatar">{{ getTecnicoInitials(orden.tecnicoNombre) }}</div>
+              <span>{{ orden.tecnicoNombre || 'Sin asignar' }}</span>
+            </div>
+            <span>{{ getRelativeTime(orden.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="empty-column" *ngIf="columns[1].ordenes.length === 0">
+          Arrastrá órdenes aquí
+        </div>
+      </div>
+    </div>
+
+    <!-- Listo Column -->
+    <div class="kanban-column listo">
+      <div class="column-header">
+        <div class="header-label">
+          <span class="header-dot"></span>
+          Listo
+        </div>
+        <span class="column-count">{{ columns[2].ordenes.length }}</span>
+      </div>
+      <div cdkDropList id="LISTO" [cdkDropListData]="columns[2].ordenes" (cdkDropListDropped)="onDrop($event)" class="cdk-drop-list">
+        <div class="kanban-card ready" cdkDrag *ngFor="let orden of columns[2].ordenes; trackBy: trackByOrdenId" (click)="navigateToDetail(orden.id)">
+          <div class="card-header">
+            <div class="client-name">#{{ padOrderId(orden.id) }} • {{ orden.clienteNombre }}</div>
+            <span class="prioridad-chip" [style.color]="getPrioridadColor(orden.prioridad)">{{ orden.prioridad }}</span>
+          </div>
+          <div class="card-equipment">Equipo {{ orden.equipoId }}</div>
+          <div class="card-divider"></div>
+          <div class="card-falla">{{ orden.fallaReportada }}</div>
+          <div class="card-footer">
+            <div class="tecnico-info">
+              <div class="tecnico-avatar">{{ getTecnicoInitials(orden.tecnicoNombre) }}</div>
+              <span>{{ orden.tecnicoNombre || 'Sin asignar' }}</span>
+            </div>
+            <span>{{ getRelativeTime(orden.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="empty-column" *ngIf="columns[2].ordenes.length === 0">
+          Arrastrá órdenes aquí
+        </div>
+      </div>
+    </div>
+
+    <!-- Entregado Column -->
+    <div class="kanban-column entregado">
+      <div class="column-header">
+        <div class="header-label">
+          <span class="header-dot"></span>
+          Entregado
+        </div>
+        <span class="column-count">{{ columns[3].ordenes.length }}</span>
+      </div>
+      <div cdkDropList id="ENTREGADO" [cdkDropListData]="columns[3].ordenes" (cdkDropListDropped)="onDrop($event)" class="cdk-drop-list">
+        <div class="kanban-card completed" cdkDrag *ngFor="let orden of (columns[3].ordenes | slice:0:3); trackBy: trackByOrdenId" (click)="navigateToDetail(orden.id)">
+          <div class="card-header">
+            <div class="client-name">#{{ padOrderId(orden.id) }} • {{ orden.clienteNombre }}</div>
+            <span class="prioridad-chip" [style.color]="getPrioridadColor(orden.prioridad)">{{ orden.prioridad }}</span>
+          </div>
+          <div class="card-equipment">Equipo {{ orden.equipoId }}</div>
+          <div class="card-divider"></div>
+          <div class="card-falla">{{ orden.fallaReportada }}</div>
+          <div class="card-footer">
+            <div class="tecnico-info">
+              <div class="tecnico-avatar">{{ getTecnicoInitials(orden.tecnicoNombre) }}</div>
+              <span>{{ orden.tecnicoNombre || 'Sin asignar' }}</span>
+            </div>
+            <span>{{ getRelativeTime(orden.updatedAt) }}</span>
+          </div>
+        </div>
+        <div class="empty-column" *ngIf="columns[3].ordenes.length === 0">
+          No hay órdenes completadas
+        </div>
+        <div *ngIf="columns[3].ordenes.length > 3" class="hidden-delivered-hint">
+          <span class="material-symbols-outlined">history</span>
+          +{{ columns[3].ordenes.length - 3 }} más · usá la vista lista para verlas
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

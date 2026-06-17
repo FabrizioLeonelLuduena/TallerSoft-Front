@@ -1,0 +1,269 @@
+.ordenes-principal-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  min-height: 100vh;
+}
+
+// ───────────────────────────────────────────────────────────
+// PAGE HEADER
+// ───────────────────────────────────────────────────────────
+
+.page-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+
+  .title-section {
+    .page-title {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .page-subtitle {
+      margin: 0;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+  }
+}
+
+// ───────────────────────────────────────────────────────────
+// CONTROL BAR
+// ───────────────────────────────────────────────────────────
+
+.control-bar {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  flex-wrap: wrap;
+
+  .search-input-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 50%;
+    min-width: 200px;
+
+    .search-icon {
+      position: absolute;
+      left: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 20px;
+      pointer-events: none;
+      transition: color 150ms ease;
+    }
+
+    .search-input {
+      padding-left: calc(var(--spacing-md) + 24px);
+      width: 100%;
+      background: rgba(0, 245, 212, 0.04);
+      border-color: rgba(0, 245, 212, 0.1);
+      transition: all 150ms ease;
+
+      &:focus {
+        background: rgba(0, 245, 212, 0.08);
+        border-color: rgba(0, 245, 212, 0.3);
+
+        ~ .search-icon {
+          color: #00f5d4;
+        }
+      }
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  .filter-select {
+    min-width: 120px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.6)' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    cursor: pointer;
+    padding-right: 28px;
+    transition: all 150ms ease;
+
+    &:hover {
+      border-color: rgba(0, 245, 212, 0.3);
+    }
+
+    &:focus {
+      border-color: rgba(0, 245, 212, 0.5);
+      outline: none;
+    }
+
+    option {
+      background: #0a0f1e;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+}
+
+// ───────────────────────────────────────────────────────────
+// HEADER ACTIONS (View Toggle + Create Button)
+// ───────────────────────────────────────────────────────────
+
+.view-toggle {
+  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.02);
+
+  .toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 200ms ease;
+
+    span.material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    &.active {
+      background: rgba(0, 245, 212, 0.1);
+      border-radius: 6px;
+      color: #00f5d4;
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.15);
+    }
+  }
+}
+
+.btn-create {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  margin-left: auto;
+  background: #00f5d4;
+  color: #0a0f1e;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 245, 212, 0.25);
+  transition: all 150ms ease;
+
+  &:hover {
+    box-shadow: 0 0 30px rgba(0, 245, 212, 0.35);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ───────────────────────────────────────────────────────────
+// CONTENT AREA
+// ───────────────────────────────────────────────────────────
+
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  .view-content {
+    flex: 1;
+    animation: viewEnter 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+// ───────────────────────────────────────────────────────────
+// ANIMATIONS
+// ───────────────────────────────────────────────────────────
+
+@keyframes viewEnter {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.view-transition-enter {
+  animation: viewEnter 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ───────────────────────────────────────────────────────────
+// RESPONSIVE
+// ───────────────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .control-bar {
+    .search-input-wrapper {
+      max-width: 60%;
+    }
+
+    .filter-select {
+      min-width: auto;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .ordenes-principal-container {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .page-header {
+    .title-section {
+      .page-title {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .control-bar {
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+
+    .search-input-wrapper {
+      max-width: 100%;
+      flex: 1 1 100%;
+    }
+
+    .filter-select {
+      flex: 1;
+    }
+  }
+}

@@ -1,0 +1,160 @@
+<div class="dialog-container glass-panel">
+  <div class="dialog-header">
+    <div class="header-text">
+      <h2 class="dialog-title">Nuevo Usuario</h2>
+      <p class="dialog-subtitle">Completá los datos del nuevo usuario</p>
+    </div>
+    <button 
+      class="btn-close" 
+      (click)="onCancel()" 
+      type="button"
+      title="Cerrar"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Nombre Field -->
+      <div class="form-field">
+        <label class="field-label">Nombre completo <span class="required">*</span></label>
+        <input
+          type="text"
+          class="ts-input"
+          [class.error]="nombreControl?.invalid && nombreControl?.touched"
+          formControlName="nombre"
+          placeholder="Ej: Juan Pérez"
+        />
+        <div class="error-text" *ngIf="nombreControl?.invalid && nombreControl?.touched">
+          El nombre es requerido
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-field">
+        <label class="field-label">Email <span class="required">*</span></label>
+        <input
+          type="email"
+          class="ts-input"
+          [class.error]="emailControl?.invalid && emailControl?.touched"
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+        />
+        <div class="error-text" *ngIf="emailControl?.invalid && emailControl?.touched">
+          {{ getEmailError() }}
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-field">
+        <label class="field-label">Contraseña <span class="required">*</span></label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            class="ts-input"
+            [class.error]="passwordControl?.invalid && passwordControl?.touched"
+            formControlName="password"
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePassword()"
+            title="Mostrar/Ocultar contraseña"
+          >
+            <span class="material-symbols-outlined">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <div class="password-hint" [class.error]="passwordControl?.invalid && passwordControl?.touched">
+          {{ getPasswordHint() }}
+        </div>
+      </div>
+
+      <!-- Role Selector -->
+      <div class="form-field">
+        <label class="field-label">Rol <span class="required">*</span></label>
+        <div class="role-selector">
+          <!-- Admin Role Card -->
+          <div
+            class="role-card"
+            [class.role-card-selected]="selectedRole === 'ADMIN'"
+            (click)="selectRole('ADMIN')"
+            type="button"
+            role="button"
+            tabindex="0"
+          >
+            <div class="role-icon">
+              <span class="material-symbols-outlined">security</span>
+            </div>
+            <div class="role-content">
+              <p class="role-name">Admin</p>
+              <p class="role-desc">Full control over system settings.</p>
+            </div>
+          </div>
+
+          <!-- Técnico Role Card -->
+          <div
+            class="role-card"
+            [class.role-card-selected]="selectedRole === 'TECNICO'"
+            (click)="selectRole('TECNICO')"
+            type="button"
+            role="button"
+            tabindex="0"
+          >
+            <div class="role-icon">
+              <span class="material-symbols-outlined">build</span>
+            </div>
+            <div class="role-content">
+              <p class="role-name">Técnico</p>
+              <p class="role-desc">Access to orders & inventory.</p>
+            </div>
+          </div>
+
+          <!-- Recepción Role Card -->
+          <div
+            class="role-card"
+            [class.role-card-selected]="selectedRole === 'RECEPCION'"
+            (click)="selectRole('RECEPCION')"
+            type="button"
+            role="button"
+            tabindex="0"
+          >
+            <div class="role-icon">
+              <span class="material-symbols-outlined">support_agent</span>
+            </div>
+            <div class="role-content">
+              <p class="role-name">Recepción</p>
+              <p class="role-desc">Manage intake & customer flow.</p>
+            </div>
+          </div>
+        </div>
+        <div class="error-text" *ngIf="rolControl?.invalid && rolControl?.touched">
+          Debe seleccionar un rol
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          type="button"
+          class="btn-cancel"
+          (click)="onCancel()"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="submit"
+          class="ts-btn-primary"
+          [disabled]="form.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">Crear Usuario</span>
+          <span *ngIf="isLoading" class="loading-state">
+            <span class="material-symbols-outlined loading-icon">hourglass_empty</span>
+            Creando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

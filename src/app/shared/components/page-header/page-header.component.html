@@ -1,0 +1,18 @@
+<div class="page-header">
+  <div class="header-content">
+    <div class="header-left">
+      <h1 class="page-title">{{ title }}</h1>
+      <p class="page-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+
+    <div class="header-right">
+      <button class="btn-filters" *ngIf="hasFilters" (click)="onFilterClick()" title="Filtros">
+        <span class="material-symbols-outlined">tune</span>
+        <span>Filtros</span>
+      </button>
+      <button class="btn-create" (click)="onCreateClick()" [title]="createLabel">
+        <span>+</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,391 @@
+/* ========================================
+   TOP BAR COMPONENT
+   ======================================== */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 var(--spacing-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+/* ── Left ─────────────────────────────── */
+
+.tb-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.tb-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.2px;
+}
+
+.tb-date {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background: var(--color-surface-2, rgba(255,255,255,0.05));
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+/* ── Right ────────────────────────────── */
+
+.tb-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.tb-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border);
+  margin: 0 var(--spacing-sm);
+}
+
+/* ── Button wrappers (relative for dropdowns) */
+
+.tb-btn-wrap {
+  position: relative;
+}
+
+/* ── Bell icon button ─────────────────── */
+
+.tb-icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 200ms ease;
+
+  .material-symbols-outlined {
+    font-size: 22px; /* icon size — intentional */
+  }
+
+  &:hover,
+  &.active {
+    background: rgba(0, 245, 212, 0.08);
+    color: var(--color-accent);
+  }
+}
+
+.tb-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  min-width: 17px;
+  height: 17px;
+  background: var(--color-danger);
+  color: #fff;
+  border-radius: 9px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-surface);
+  padding: 0 2px;
+  line-height: var(--line-height-tight);
+}
+
+/* ── User button ──────────────────────── */
+
+.tb-user-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: all 200ms ease;
+
+  &:hover,
+  &.active {
+    background: rgba(0, 245, 212, 0.08);
+  }
+}
+
+.tb-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), #00d9c4);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.25);
+  overflow: hidden;
+}
+
+.tb-avatar-photo,
+.td-avatar-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.tb-username {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.tb-chevron {
+  font-size: 18px; /* icon size — intentional */
+  color: var(--color-text-muted);
+  transition: transform 200ms ease;
+
+  .tb-user-btn.active & {
+    transform: rotate(180deg);
+  }
+}
+
+/* ── Shared dropdown panel ────────────── */
+
+.tb-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-surface-2, var(--color-surface));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: tb-slide-in 180ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 500;
+}
+
+@keyframes tb-slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Notifications dropdown ───────────── */
+
+.notifications-dropdown {
+  width: 360px;
+}
+
+.td-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.td-count {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  background: rgba(0, 245, 212, 0.12);
+  border-radius: 12px;
+  padding: 2px 8px;
+}
+
+.td-body {
+  max-height: 360px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+  }
+}
+
+.alerta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: 11px var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  transition: background 150ms ease;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(255, 255, 255, 0.03); }
+  &.unread { background: rgba(0, 245, 212, 0.04); }
+  &.danger .alerta-icon { color: var(--color-danger); }
+  &.warn   .alerta-icon { color: #f59e0b; }
+}
+
+.alerta-icon {
+  font-size: 20px; /* icon size — intentional */
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-text-muted);
+}
+
+.alerta-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.alerta-title {
+  margin: 0 0 3px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alerta-desc {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mark-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: all 150ms ease;
+
+  &:hover {
+    background: rgba(0, 245, 212, 0.1);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .material-symbols-outlined { font-size: 14px; /* icon size — intentional */}
+}
+
+.td-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+
+  .material-symbols-outlined {
+    font-size: 32px; /* icon size — intentional */
+    color: var(--color-accent);
+    opacity: 0.45;
+  }
+}
+
+/* ── User dropdown ────────────────────── */
+
+.user-dropdown {
+  min-width: 210px;
+}
+
+.td-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 12px var(--spacing-md);
+}
+
+.td-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), #0ea5e9);
+  color: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.td-user-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.td-user-role {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.td-sep {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.td-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 12px var(--spacing-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+
+  .material-symbols-outlined { font-size: 18px; /* icon size — intentional */ }
+
+  &:hover {
+    background: rgba(0, 245, 212, 0.08);
+    color: var(--color-accent);
+    .material-symbols-outlined { color: var(--color-accent); }
+  }
+
+  &.td-logout:hover {
+    color: var(--color-danger);
+    .material-symbols-outlined { color: var(--color-danger); }
+  }
+}

@@ -1,0 +1,125 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onCancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>Editar Repuesto</h2>
+      <button class="btn-close" type="button" (click)="onCancel()" [disabled]="loading">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" class="modal-form" (ngSubmit)="onSubmit()">
+
+      <div class="form-field">
+        <label for="d-nombre">Nombre <span class="required">*</span></label>
+        <input
+          id="d-nombre"
+          type="text"
+          class="ts-input"
+          formControlName="nombre"
+          placeholder="Ej: Pantalla OLED iPhone 13"
+          [class.error]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+        />
+        <span class="error-text" *ngIf="form.get('nombre')?.hasError('required') && form.get('nombre')?.touched">
+          El nombre es requerido
+        </span>
+        <span class="error-text" *ngIf="form.get('nombre')?.hasError('minlength') && form.get('nombre')?.touched">
+          Debe tener al menos 3 caracteres
+        </span>
+      </div>
+
+      <div class="form-field">
+        <label for="d-categoria">Categoría</label>
+        <input
+          id="d-categoria"
+          type="text"
+          class="ts-input"
+          formControlName="categoria"
+          placeholder="Ej: Pantallas, Baterías, Cables..."
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="d-precio">Precio <span class="required">*</span></label>
+        <input
+          id="d-precio"
+          type="number"
+          class="ts-input"
+          formControlName="precio"
+          placeholder="Ej: 45000"
+          min="0"
+          step="0.01"
+          [class.error]="form.get('precio')?.invalid && form.get('precio')?.touched"
+        />
+        <span class="error-text" *ngIf="form.get('precio')?.hasError('required') && form.get('precio')?.touched">
+          El precio es requerido
+        </span>
+        <span class="error-text" *ngIf="form.get('precio')?.hasError('min') && form.get('precio')?.touched">
+          El precio debe ser mayor a 0
+        </span>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label for="d-stockActual">Stock Actual <span class="required">*</span></label>
+          <input
+            id="d-stockActual"
+            type="number"
+            class="ts-input"
+            formControlName="stockActual"
+            min="0"
+            step="1"
+            [class.error]="form.get('stockActual')?.invalid && form.get('stockActual')?.touched"
+          />
+          <span class="error-text" *ngIf="form.get('stockActual')?.hasError('min') && form.get('stockActual')?.touched">
+            No puede ser negativo
+          </span>
+        </div>
+
+        <div class="form-field">
+          <label for="d-stockMinimo">Stock Mínimo (Crítico) <span class="required">*</span></label>
+          <input
+            id="d-stockMinimo"
+            type="number"
+            class="ts-input"
+            formControlName="stockMinimo"
+            min="0"
+            step="1"
+            [class.error]="form.get('stockMinimo')?.invalid && form.get('stockMinimo')?.touched"
+          />
+          <span class="error-text" *ngIf="form.get('stockMinimo')?.hasError('min') && form.get('stockMinimo')?.touched">
+            No puede ser negativo
+          </span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="d-stockBajo">Stock Bajo (Alerta) <span class="required">*</span></label>
+        <input
+          id="d-stockBajo"
+          type="number"
+          class="ts-input"
+          formControlName="stockBajo"
+          min="0"
+          step="1"
+          [class.error]="form.get('stockBajo')?.invalid && form.get('stockBajo')?.touched"
+        />
+        <span class="error-text" *ngIf="form.get('stockBajo')?.hasError('min') && form.get('stockBajo')?.touched">
+          No puede ser negativo
+        </span>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" type="button" (click)="onCancel()" [disabled]="loading">
+          Cancelar
+        </button>
+        <button class="btn-save" type="submit" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="18"></mat-spinner>
+          <mat-icon *ngIf="!loading">edit</mat-icon>
+          {{ loading ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

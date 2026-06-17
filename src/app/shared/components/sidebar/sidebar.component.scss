@@ -1,0 +1,56 @@
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .user-info {
+    margin-right: 16px;
+    font-size: 14px;
+  }
+}
+
+.drawer-container {
+  height: calc(100vh - 64px);
+}
+
+.sidebar {
+  width: 250px;
+
+  mat-nav-list {
+    padding: 0;
+
+    mat-list-item {
+      margin-top: 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      margin-right: 8px;
+
+      &.active {
+        background-color: rgba(63, 81, 181, 0.1);
+        color: #3f51b5;
+
+        mat-icon {
+          color: #3f51b5;
+        }
+      }
+
+      &:hover {
+        background-color: rgba(63, 81, 181, 0.05);
+      }
+    }
+  }
+}
+
+.main-content {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}

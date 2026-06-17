@@ -1,0 +1,162 @@
+<div class="ordenes-container">
+  <!-- Skeleton Loaders -->
+  <div class="table-wrapper" *ngIf="isLoading">
+    <div class="table-container glass-panel">
+      <div class="table-header">
+        <div class="col-id">#</div>
+        <div class="col-cliente">CLIENTE</div>
+        <div class="col-equipo">EQUIPO</div>
+        <div class="col-estado">ESTADO</div>
+        <div class="col-prioridad">PRIORIDAD</div>
+        <div class="col-tecnico">TÉCNICO</div>
+        <div class="col-presupuesto">PRESUPUESTO</div>
+        <div class="col-fecha">FECHA</div>
+        <div class="col-acciones"></div>
+      </div>
+      <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-wrapper" *ngIf="!isLoading && ordenesSorted.length > 0">
+    <div class="table-container glass-panel">
+      <div class="table-header">
+        <div class="col-id">#</div>
+        <div class="col-cliente">CLIENTE</div>
+        <div class="col-equipo">EQUIPO</div>
+        <div class="col-estado">ESTADO</div>
+        <div class="col-prioridad">PRIORIDAD</div>
+        <div class="col-tecnico">TÉCNICO</div>
+        <div class="col-presupuesto">PRESUPUESTO</div>
+        <div class="col-fecha">FECHA</div>
+        <div class="col-acciones"></div>
+      </div>
+
+      <!-- Estado Group Separator & Rows -->
+      <ng-container *ngFor="let orden of pagedOrdenes; let i = index">
+        <!-- Estado Separator -->
+        <div *ngIf="shouldShowEstadoSeparator(i)" class="estado-separator">
+          <div class="separator-line"></div>
+          <div class="separator-label">
+            {{ getEstadoForSeparator(i) }}
+            <span class="count">({{ getEstadoCount(getEstadoForSeparator(i)) }})</span>
+          </div>
+          <div class="separator-line"></div>
+        </div>
+
+        <!-- Row -->
+        <div 
+          class="table-row card-enter"
+          [style.animation-delay]="(i * 40) + 'ms'"
+        >
+          <div class="col-id monospace">{{ padOrderId(orden.id) }}</div>
+          
+          <div class="col-cliente">{{ orden.clienteNombre }}</div>
+
+          <div class="col-equipo">
+            <span class="equipo-badge">Equipo #{{ orden.equipoId }}</span>
+          </div>
+
+          <div class="col-estado">
+            <span 
+              class="status-badge"
+              [ngClass]="'estado-' + (orden.estado | lowercase)"
+            >
+              {{ orden.estado }}
+            </span>
+          </div>
+
+          <div class="col-prioridad">
+            <span class="priority-text" [style.color]="getPrioridadColor(orden.prioridad)">
+              {{ orden.prioridad }}
+            </span>
+          </div>
+
+          <div class="col-tecnico">
+            <div class="tecnico-info">
+              <div class="tecnico-avatar">{{ getInitials(orden.tecnicoNombre) }}</div>
+              <span>{{ orden.tecnicoNombre || '—' }}</span>
+            </div>
+          </div>
+
+          <div class="col-presupuesto">
+            {{ orden.presupuesto ? formatCurrency(orden.presupuesto) : '—' }}
+          </div>
+
+          <div class="col-fecha">
+            {{ getRelativeTime(orden.createdAt) }}
+          </div>
+
+          <div class="col-acciones">
+            <button 
+              class="btn-action"
+              (click)="navigateToDetail(orden.id, $event)"
+              title="Ver detalle"
+            >
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button 
+              class="btn-action"
+              (click)="navigateToDetail(orden.id, $event)"
+              title="Editar"
+            >
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button
+              *ngIf="orden.estado === 'PENDIENTE'"
+              class="btn-action btn-danger"
+              (click)="showDeleteOrdenModal(orden, $event)"
+              title="Cancelar orden"
+            >
+              <span class="material-symbols-outlined">cancel</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalPages > 1" class="pagination-controls">
+    <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <span class="pag-label">Página {{ currentPage }} de {{ totalPages }}</span>
+    <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+    <span class="pag-count">{{ pageStart }}–{{ pageEnd }} de {{ ordenesSorted.length }}</span>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && ordenesSorted.length === 0" class="empty-state">
+    <span class="material-symbols-outlined empty-icon">inbox</span>
+    <h3>No hay órdenes</h3>
+    <p>{{ searchTerm ? 'No se encontraron órdenes con los criterios de búsqueda' : 'Comenzá a crear órdenes de trabajo' }}</p>
+  </div>
+
+  <!-- Cancel Confirmation Modal (native <dialog> → top layer, siempre cubre todo el viewport) -->
+  <dialog #cancelDialog class="cancel-dialog"
+    (click)="closeDeleteOrdenModal()"
+    (cancel)="closeDeleteOrdenModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>¿Cancelar Orden {{ ordenToDelete ? padOrderId(ordenToDelete.id) : '' }}?</h2>
+      </div>
+      <div class="modal-body">
+        <p class="warning-text">
+          Estás a punto de cancelar esta orden de trabajo. El stock de repuestos reservados será devuelto al inventario.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeDeleteOrdenModal()" [disabled]="isDeleting" type="button">
+          Volver
+        </button>
+        <button class="btn-delete" (click)="confirmDeleteOrden()" [disabled]="isDeleting" type="button">
+          <span *ngIf="!isDeleting">Sí, cancelar</span>
+          <span *ngIf="isDeleting">Cancelando...</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>

@@ -1,0 +1,360 @@
+<div class="caja-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <!-- View Mode Toggle -->
+    <div class="view-toggle">
+      <button
+        class="toggle-btn"
+        [class.active]="viewMode === 'cobros'"
+        (click)="switchView('cobros')"
+        title="Órdenes para cobrar">
+        <span class="material-symbols-outlined">point_of_sale</span>
+      </button>
+      <button
+        class="toggle-btn"
+        [class.active]="viewMode === 'caja'"
+        (click)="switchView('caja')"
+        title="Caja del día">
+        <span class="material-symbols-outlined">receipt_long</span>
+      </button>
+      <button
+        class="toggle-btn"
+        [class.active]="viewMode === 'historial'"
+        (click)="switchView('historial')"
+        title="Historial de cajas">
+        <span class="material-symbols-outlined">bar_chart</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TOGGLE 1 — Órdenes pendientes de cobro
+       ════════════════════════════════════════ -->
+  <div *ngIf="viewMode === 'cobros'" class="view-content view-transition-enter">
+
+    <div class="pending-info" *ngIf="!isLoading">
+      <span class="material-symbols-outlined">schedule</span>
+      {{ ordenesPendientes.length }} orden{{ ordenesPendientes.length !== 1 ? 'es' : '' }} pendiente{{ ordenesPendientes.length !== 1 ? 's' : '' }} de cobro
+    </div>
+
+    <!-- Skeleton -->
+    <div class="table-container" *ngIf="isLoading">
+      <div class="skeleton-table">
+        <div class="skeleton-row-header"></div>
+        <div class="skeleton-row" *ngFor="let i of [1,2,3,4]"></div>
+      </div>
+    </div>
+
+    <!-- Tabla de pendientes -->
+    <div class="table-container" *ngIf="!isLoading && ordenesPendientes.length > 0">
+      <table class="caja-table">
+        <thead>
+          <tr class="table-header">
+            <th class="col-orden">Orden</th>
+            <th class="col-cliente">Cliente</th>
+            <th class="col-falla">Falla reportada</th>
+            <th class="col-monto">Presupuesto</th>
+            <th class="col-acciones"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table-row" *ngFor="let orden of pagedPendientes">
+            <td class="col-orden">
+              <span class="orden-id">{{ padOrderId(orden.id) }}</span>
+            </td>
+            <td class="col-cliente">{{ orden.clienteNombre }}</td>
+            <td class="col-falla">
+              <span class="falla-text">{{ orden.fallaReportada }}</span>
+            </td>
+            <td class="col-monto">{{ formatCurrency(orden.presupuesto) }}</td>
+            <td class="col-acciones">
+              <a class="btn-cobrar" [routerLink]="['/caja/cobrar', orden.id]">
+                <span class="material-symbols-outlined">point_of_sale</span>
+                Cobrar
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination cobros -->
+    <div *ngIf="!isLoading && pendTotalPages > 1" class="pagination-controls">
+      <button class="pag-btn" [disabled]="pendPage === 1" (click)="prevPendPage()">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="pag-label">Página {{ pendPage }} de {{ pendTotalPages }}</span>
+      <button class="pag-btn" [disabled]="pendPage === pendTotalPages" (click)="nextPendPage()">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+      <span class="pag-count">{{ pendPageStart }}–{{ pendPageEnd }} de {{ ordenesPendientes.length }}</span>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && ordenesPendientes.length === 0">
+      <span class="material-symbols-outlined empty-icon">check_circle</span>
+      <h3>Todo al día</h3>
+      <p>No hay órdenes en estado LISTO esperando cobro</p>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TOGGLE 2 — Caja del día (hoy)
+       ════════════════════════════════════════ -->
+  <div *ngIf="viewMode === 'caja'" class="view-content view-transition-enter">
+
+    <!-- Skeleton cards -->
+    <div class="summary-grid" *ngIf="isLoading">
+      <div class="summary-card skeleton-card" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton-line" style="width: 40px; height: 40px; border-radius: 50%;"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line" style="width: 60%; height: 12px;"></div>
+          <div class="skeleton-line" style="width: 80%; height: 24px; margin-top: 6px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid" *ngIf="!isLoading && cajaDiaria">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">Total del día</span>
+          <span class="summary-value accent">{{ formatCurrency(cajaDiaria.totalDia) }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon success">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">Efectivo</span>
+          <span class="summary-value">{{ formatCurrency(cajaDiaria.totalEfectivo) }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon info">
+          <mat-icon>credit_card</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">Tarjeta</span>
+          <span class="summary-value">{{ formatCurrency(cajaDiaria.totalTarjeta) }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon mp">
+          <mat-icon>qr_code</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">MercadoPago</span>
+          <span class="summary-value">{{ formatCurrency(cajaDiaria.totalMercadoPago) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton table -->
+    <div class="table-container" *ngIf="isLoading">
+      <div class="skeleton-table">
+        <div class="skeleton-row-header"></div>
+        <div class="skeleton-row" *ngFor="let i of [1,2,3]"></div>
+      </div>
+    </div>
+
+    <!-- Cobros Table -->
+    <div class="table-container" *ngIf="!isLoading && cajaDiaria && cajaDiaria.cobrosDelDia.length > 0">
+      <div class="table-title-row">
+        <h3 class="table-title">Cobros del {{ formatFechaHoy() }}</h3>
+        <span class="count-badge">{{ cajaDiaria.cantidadOrdenes }} cobro{{ cajaDiaria.cantidadOrdenes !== 1 ? 's' : '' }}</span>
+      </div>
+      <table class="caja-table">
+        <thead>
+          <tr class="table-header">
+            <th class="col-orden">Orden</th>
+            <th class="col-cliente">Cliente</th>
+            <th class="col-medio">Medio</th>
+            <th class="col-monto">Monto</th>
+            <th class="col-estado">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table-row" *ngFor="let cobro of pagedCobros">
+            <td class="col-orden"><span class="orden-id">{{ padOrderId(cobro.ordenId) }}</span></td>
+            <td class="col-cliente">{{ cobro.clienteNombre }}</td>
+            <td class="col-medio">
+              <div class="medio-cell">
+                <mat-icon class="medio-icon">{{ getMedioPagoIcon(cobro.medioPago) }}</mat-icon>
+                <span>{{ getMedioPagoLabel(cobro.medioPago) }}</span>
+              </div>
+            </td>
+            <td class="col-monto">{{ formatCurrency(cobro.monto) }}</td>
+            <td class="col-estado">
+              <span class="estado-chip" [class]="getEstadoClass(cobro)">{{ cobro.estadoPago }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination cobros del día -->
+    <div *ngIf="!isLoading && cobrosTotalPages > 1" class="pagination-controls">
+      <button class="pag-btn" [disabled]="cobrosPage === 1" (click)="prevCobrosPage()">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="pag-label">Página {{ cobrosPage }} de {{ cobrosTotalPages }}</span>
+      <button class="pag-btn" [disabled]="cobrosPage === cobrosTotalPages" (click)="nextCobrosPage()">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+      <span class="pag-count">{{ cobrosPageStart }}–{{ cobrosPageEnd }} de {{ cajaDiaria?.cobrosDelDia?.length }}</span>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && cajaDiaria && cajaDiaria.cobrosDelDia.length === 0">
+      <span class="material-symbols-outlined empty-icon">receipt_long</span>
+      <h3>Sin movimientos hoy</h3>
+      <p>No hay cobros registrados para el día de hoy</p>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════════
+       TOGGLE 3 — Historial de cajas diarias
+       ════════════════════════════════════════ -->
+  <div *ngIf="viewMode === 'historial'" class="view-content view-transition-enter">
+
+    <!-- Selector de período -->
+    <div class="periodo-selector">
+      <div class="periodo-group">
+        <label class="periodo-label">Mes</label>
+        <select class="periodo-select ts-input" [(ngModel)]="selectedMes" (change)="onPeriodoChange()">
+          <option *ngFor="let mes of meses; let i = index" [value]="i + 1">{{ mes }}</option>
+        </select>
+      </div>
+      <div class="periodo-group">
+        <label class="periodo-label">Año</label>
+        <select class="periodo-select ts-input" [(ngModel)]="selectedAnio" (change)="onPeriodoChange()">
+          <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Skeleton resumen -->
+    <div class="summary-grid" *ngIf="isLoadingHistorial">
+      <div class="summary-card skeleton-card" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton-line" style="width: 40px; height: 40px; border-radius: 50%;"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line" style="width: 60%; height: 12px;"></div>
+          <div class="skeleton-line" style="width: 80%; height: 24px; margin-top: 6px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen mensual -->
+    <div class="summary-grid" *ngIf="!isLoadingHistorial && historialCajas.length > 0">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">Total {{ getMesLabel() }}</span>
+          <span class="summary-value accent">{{ formatCurrency(getTotalMes()) }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon success">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">Efectivo</span>
+          <span class="summary-value">{{ formatCurrency(getTotalMesEfectivo()) }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon info">
+          <mat-icon>credit_card</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">Tarjeta</span>
+          <span class="summary-value">{{ formatCurrency(getTotalMesTarjeta()) }}</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon mp">
+          <mat-icon>qr_code</mat-icon>
+        </div>
+        <div class="summary-content">
+          <span class="summary-label">MercadoPago</span>
+          <span class="summary-value">{{ formatCurrency(getTotalMesMercadoPago()) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton tabla -->
+    <div class="table-container" *ngIf="isLoadingHistorial">
+      <div class="skeleton-table">
+        <div class="skeleton-row-header"></div>
+        <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]"></div>
+      </div>
+    </div>
+
+    <!-- Tabla de cierres diarios -->
+    <div class="table-container" *ngIf="!isLoadingHistorial && historialCajas.length > 0">
+      <div class="table-title-row">
+        <h3 class="table-title">Cierres de {{ getMesLabel() }} {{ selectedAnio }}</h3>
+        <span class="count-badge">{{ getTotalMesCobros() }} cobro{{ getTotalMesCobros() !== 1 ? 's' : '' }}</span>
+      </div>
+      <table class="caja-table historial-table">
+        <thead>
+          <tr class="table-header">
+            <th class="col-fecha">Fecha</th>
+            <th class="col-cobros">Cobros</th>
+            <th class="col-efectivo">Efectivo</th>
+            <th class="col-tarjeta">Tarjeta</th>
+            <th class="col-mp">MercadoPago</th>
+            <th class="col-total-dia">Total del día</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table-row" *ngFor="let cierre of historialCajas">
+            <td class="col-fecha">
+              <span class="fecha-text">{{ formatFecha(cierre.fecha) }}</span>
+            </td>
+            <td class="col-cobros">
+              <span class="cobros-badge">{{ cierre.cantidadOrdenes }}</span>
+            </td>
+            <td class="col-efectivo">{{ formatCurrency(cierre.totalEfectivo) }}</td>
+            <td class="col-tarjeta">{{ formatCurrency(cierre.totalTarjeta) }}</td>
+            <td class="col-mp">{{ formatCurrency(cierre.totalMercadoPago) }}</td>
+            <td class="col-total-dia">
+              <span class="total-accent">{{ formatCurrency(cierre.totalDia) }}</span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="table-footer-row">
+            <td class="col-fecha footer-label">Total del mes</td>
+            <td class="col-cobros">
+              <span class="cobros-badge">{{ getTotalMesCobros() }}</span>
+            </td>
+            <td class="col-efectivo">{{ formatCurrency(getTotalMesEfectivo()) }}</td>
+            <td class="col-tarjeta">{{ formatCurrency(getTotalMesTarjeta()) }}</td>
+            <td class="col-mp">{{ formatCurrency(getTotalMesMercadoPago()) }}</td>
+            <td class="col-total-dia">
+              <span class="total-accent grand-total">{{ formatCurrency(getTotalMes()) }}</span>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Empty state historial -->
+    <div class="empty-state" *ngIf="!isLoadingHistorial && historialCajas.length === 0">
+      <span class="material-symbols-outlined empty-icon">bar_chart</span>
+      <h3>Sin movimientos</h3>
+      <p>No hay cierres registrados para {{ getMesLabel() }} {{ selectedAnio }}</p>
+    </div>
+
+  </div>
+
+</div>

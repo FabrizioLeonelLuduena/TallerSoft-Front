@@ -1,0 +1,266 @@
+<div class="detail-container">
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="skeleton-card">
+      <div class="skeleton-header">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-name"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail content -->
+  <div class="detail-content" *ngIf="!isLoading && cliente">
+    <!-- Header card with glass panel -->
+    <section class="glass-panel header-card">
+      <div class="header-inner">
+        <div class="avatar-section">
+          <div class="client-avatar">
+            {{ getInitials(cliente.nombre) }}
+          </div>
+        </div>
+
+        <div class="client-section">
+          <div class="client-header">
+            <h1 class="client-name">{{ cliente.nombre }}</h1>
+          </div>
+          <p class="client-description" *ngIf="cliente.email">
+            {{ cliente.email }}
+          </p>
+          <div class="info-details">
+            <div class="detail-item" *ngIf="cliente.telefono">
+              <span class="material-symbols-outlined">call</span>
+              <span>{{ cliente.telefono }}</span>
+            </div>
+            <div class="detail-item" *ngIf="cliente.direccion">
+              <span class="material-symbols-outlined">location_on</span>
+              <span>{{ cliente.direccion }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back button -->
+        <div class="header-actions">
+          <button
+            class="action-btn"
+            title="Volver"
+            routerLink="/clientes"
+            type="button"
+          >
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Edit / Delete -->
+      <div class="header-footer">
+        <button
+          class="btn-icon"
+          title="Editar cliente"
+          (click)="onEdit()"
+          type="button"
+        >
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+        <button
+          class="btn-icon-danger"
+          title="Desactivar cliente"
+          *ngIf="currentRole === 'ADMIN' && cliente?.activo"
+          (click)="onDelete()"
+          type="button"
+        >
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <button
+          class="btn-icon-success"
+          title="Reactivar cliente"
+          *ngIf="currentRole === 'ADMIN' && !cliente?.activo"
+          (click)="onReactivar()"
+          type="button"
+        >
+          <span class="material-symbols-outlined">restore</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Tabs section -->
+    <section class="tabs-section">
+      <div class="tab-nav">
+        <div class="tab-buttons">
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'equipos'"
+            (click)="setActiveTab('equipos')"
+            type="button"
+          >
+            <span class="material-symbols-outlined">devices</span>
+            <span>Equipos</span>
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'historial'"
+            (click)="setActiveTab('historial')"
+            type="button"
+          >
+            <span class="material-symbols-outlined">history</span>
+            <span>Historial</span>
+          </button>
+        </div>
+        <button 
+          class="btn-add-equipo"
+          title="Agregar equipo"
+          *ngIf="activeTab === 'equipos'"
+          (click)="onAddEquipo()"
+          type="button"
+        >
+          <span class="material-symbols-outlined">add</span>
+        </button>
+      </div>
+
+      <!-- Equipos Tab Content -->
+      <div class="tab-content" *ngIf="activeTab === 'equipos'">
+        <div class="equipos-grid">
+          <!-- Loading skeleton -->
+          <ng-container *ngIf="loadingEquipos">
+            <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </div>
+          </ng-container>
+
+          <!-- Equipos cards -->
+          <div class="glass-panel equipo-card" *ngFor="let equipo of equipos" [hidden]="loadingEquipos">
+            <div class="equipo-header">
+              <div class="equipo-icon">
+                <span class="material-symbols-outlined">{{ getEquipoIcon(equipo.tipo) }}</span>
+              </div>
+              <div class="equipo-title">
+                <h3>{{ equipo.marca }} {{ equipo.modelo }}</h3>
+              </div>
+            </div>
+            <p class="equipo-serial" *ngIf="equipo.numeroSerie">
+              Serial: {{ equipo.numeroSerie }}
+            </p>
+            <p class="equipo-observaciones" *ngIf="equipo.observaciones">
+              {{ equipo.observaciones }}
+            </p>
+            <div class="equipo-footer">
+              <div class="equipo-actions">
+                <button 
+                  class="btn-equipo"
+                  title="Editar"
+                  (click)="onEditEquipo(equipo)"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button 
+                  class="btn-equipo btn-delete"
+                  title="Eliminar"
+                  (click)="onDeleteEquipo(equipo)"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="empty-tab" *ngIf="!loadingEquipos && equipos.length === 0">
+            <span class="material-symbols-outlined">devices_other</span>
+            <p>No hay equipos registrados</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historial Tab Content -->
+      <div class="tab-content" *ngIf="activeTab === 'historial'">
+        <div class="historial-timeline">
+          <!-- Loading skeleton -->
+          <ng-container *ngIf="loadingOrdenes">
+            <div class="skeleton-row" *ngFor="let i of [1,2,3]"></div>
+          </ng-container>
+
+          <!-- Orders table -->
+          <table class="ordenes-table" *ngIf="!loadingOrdenes && ordenes.length > 0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Equipo</th>
+                <th>Estado</th>
+                <th>Presupuesto</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let orden of ordenes" class="table-row" [routerLink]="['/ordenes', orden.id]">
+                <td>#{{ orden.id }}</td>
+                <td>{{ orden.equipoNombre || 'Sin equipo' }}</td>
+                <td>
+                  <span class="estado-chip" [ngClass]="'estado-' + getEstadoClass(orden.estado)">
+                    {{ orden.estado }}
+                  </span>
+                </td>
+                <td>{{ formatCurrency(orden.presupuesto) }}</td>
+                <td>{{ orden.createdAt | date: 'dd/MM/yyyy' }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty state -->
+          <div class="empty-tab" *ngIf="!loadingOrdenes && ordenes.length === 0">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <p>No hay órdenes registradas</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <app-delete-confirm-modal
+    [isOpen]="isDeleteModalOpen"
+    [clienteName]="cliente?.nombre || ''"
+    [clienteId]="cliente?.id || null"
+    (confirmed)="onDeleteConfirmed()"
+    (cancelled)="onDeleteCancelled()"
+  ></app-delete-confirm-modal>
+
+  <!-- Edit cliente modal -->
+  <app-edit-cliente-modal
+    [isOpen]="isEditModalOpen"
+    [cliente]="cliente"
+    (saved)="onEditSaved($event)"
+    (cancelled)="onEditCancelled()"
+  ></app-edit-cliente-modal>
+
+  <!-- Add equipo modal -->
+  <app-add-equipo-modal
+    [isOpen]="isAddEquipoModalOpen"
+    [clienteId]="cliente?.id || null"
+    (equipoAdded)="onEquipoAdded()"
+    (cancelled)="onAddEquipoCancelled()"
+  ></app-add-equipo-modal>
+
+  <!-- Edit equipo modal -->
+  <app-edit-equipo-modal
+    [isOpen]="isEditEquipoModalOpen"
+    [equipo]="selectedEquipoForEdit"
+    (saved)="onEquipoSaved($event)"
+    (cancelled)="onEditEquipoCancelled()"
+  ></app-edit-equipo-modal>
+
+  <!-- Delete equipo modal -->
+  <app-delete-equipo-modal
+    [isOpen]="isDeleteEquipoModalOpen"
+    [equipo]="selectedEquipoForDelete"
+    (confirmed)="onDeleteEquipoConfirmed()"
+    (cancelled)="onDeleteEquipoCancelled()"
+  ></app-delete-equipo-modal>
+</div>

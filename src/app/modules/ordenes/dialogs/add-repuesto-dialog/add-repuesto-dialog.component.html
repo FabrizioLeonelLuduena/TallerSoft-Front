@@ -1,0 +1,84 @@
+<div class="dialog-header">
+  <h2>Agregar Repuesto</h2>
+  <button class="btn-close" (click)="onCancel()">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+</div>
+
+<div class="dialog-content">
+  <!-- Search Input -->
+  <div class="search-wrapper">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (input)="onSearch($event)"
+      placeholder="Buscar repuesto..."
+      class="search-input"
+    />
+    <div class="search-results" *ngIf="filteredRepuestos.length > 0">
+      <div class="result-item" *ngFor="let repuesto of filteredRepuestos" (click)="onSelectRepuesto(repuesto)">
+        <div class="result-name">{{ repuesto.nombre }}</div>
+        <div class="result-details">
+          <span>${{ repuesto.precio }}</span>
+          <span *ngIf="repuesto.critico" class="critico">Stock crítico</span>
+          <span>Stock: {{ repuesto.stockActual }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Repuesto -->
+  <div *ngIf="selectedRepuesto" class="selected-repuesto">
+    <span class="checkmark">✓</span>
+    <div class="repuesto-info">
+      <div class="repuesto-nombre">{{ selectedRepuesto.nombre }}</div>
+      <div class="repuesto-stock">Stock disponible: {{ selectedRepuesto.stockActual }} unidades</div>
+    </div>
+  </div>
+
+  <!-- Quantity + Price -->
+  <div class="cantidad-section" *ngIf="selectedRepuesto">
+    <div class="form-group">
+      <label>Cantidad</label>
+      <div class="cantidad-control">
+        <button class="stepper-btn" (click)="decrementar()" [disabled]="cantidad <= 1">−</button>
+        <input
+          type="number"
+          [(ngModel)]="cantidad"
+          [min]="1"
+          [max]="selectedRepuesto.stockActual"
+          class="input-field cantidad-input"
+          (ngModelChange)="onCantidadChange()"
+        />
+        <button class="stepper-btn" (click)="incrementar()" [disabled]="cantidad >= selectedRepuesto.stockActual">+</button>
+      </div>
+    </div>
+
+    <div class="precio-resumen">
+      <div class="precio-row">
+        <span>Precio unitario</span>
+        <span>${{ selectedRepuesto.precio | number:'1.2-2' }}</span>
+      </div>
+      <div class="precio-row total">
+        <span>Total</span>
+        <span>${{ totalPrecio | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Error -->
+  <div class="stock-error" *ngIf="stockError">
+    {{ stockError }}
+  </div>
+</div>
+
+<div class="dialog-actions">
+  <button class="btn-cancel" (click)="onCancel()">Cancelar</button>
+  <button 
+    class="btn-submit" 
+    (click)="onSubmit()" 
+    [disabled]="!selectedRepuesto || isLoading"
+  >
+    {{ isLoading ? 'Agregando...' : 'Agregar →' }}
+  </button>
+</div>

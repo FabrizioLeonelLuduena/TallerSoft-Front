@@ -1,0 +1,150 @@
+<div class="usuarios-container page-enter" *ngIf="currentRole === 'ADMIN'">
+  <!-- Search & Filter Bar -->
+  <div class="search-filter-bar">
+    <div class="search-input-wrapper">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input 
+        type="text"
+        class="ts-input search-input"
+        placeholder="Buscar por nombre o email..."
+        [value]="searchTerm"
+        (input)="onSearch($event)"
+      />
+    </div>
+    <button 
+      class="btn-create"
+      (click)="onCreateClick()"
+      type="button"
+      title="Nuevo Usuario"
+    >
+      <span>+</span>
+    </button>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card glass-panel">
+    <!-- Skeleton Loader -->
+    <div *ngIf="isLoading" class="skeleton-rows">
+      <div class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]">
+        <div class="skeleton-col"></div>
+        <div class="skeleton-col"></div>
+        <div class="skeleton-col"></div>
+        <div class="skeleton-col"></div>
+      </div>
+    </div>
+
+    <!-- Table Content -->
+    <table class="data-table" *ngIf="!isLoading && filteredUsuarios.length > 0">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of pagedUsuarios; let i = index" class="table-row table-row-enter" [style.animation-delay]="(i * 25) + 'ms'">
+          <!-- Usuario Column -->
+          <td class="cell-usuario">
+            <div class="user-cell">
+              <div class="user-avatar" [class.has-photo]="usuario.avatarImage">
+                <img *ngIf="usuario.avatarImage; else initialsOnly"
+                     [src]="usuario.avatarImage" alt="avatar" class="avatar-img" />
+                <ng-template #initialsOnly>{{ getInitials(usuario.nombre) }}</ng-template>
+              </div>
+              <div class="user-info">
+                <div class="user-name">{{ usuario.nombre }}</div>
+                <div class="user-date">
+                  Desde {{ formatDate(usuario.createdAt) }}
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Email Column -->
+          <td class="cell-email">{{ usuario.email }}</td>
+
+          <!-- Rol Column -->
+          <td class="cell-rol">
+            <span class="rol-badge" [ngClass]="getRolBadgeClass(usuario.rol)">
+              {{ getRolDisplayText(usuario.rol) }}
+            </span>
+          </td>
+
+          <!-- Estado Column -->
+          <td class="cell-estado">
+            <span class="estado-badge" [class.inactivo]="!usuario.activo">
+              <span class="estado-dot"></span>
+              {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+
+          <!-- Acciones Column -->
+          <td class="cell-acciones">
+            <button (click)="openEditDialog(usuario)" class="btn-icon" type="button" title="Editar usuario">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button *ngIf="usuario.activo" (click)="openDeleteUserModal(usuario)" class="btn-icon-danger" type="button" title="Desactivar usuario">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+            <button *ngIf="!usuario.activo" (click)="reactivarUsuario(usuario)" class="btn-icon-success" type="button" title="Reactivar usuario">
+              <span class="material-symbols-outlined">restore</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div *ngIf="!isLoading && totalPages > 1" class="pagination-controls">
+      <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="pag-label">Página {{ currentPage }} de {{ totalPages }}</span>
+      <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+      <span class="pag-count">{{ pageStart }}–{{ pageEnd }} de {{ filteredUsuarios.length }}</span>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredUsuarios.length === 0">
+      <span class="material-symbols-outlined">group</span>
+      <p class="empty-title">No hay usuarios registrados</p>
+      <button class="ts-btn-primary" (click)="openCreateDialog()" type="button">
+        <span class="material-symbols-outlined">add</span>
+        Agregar el primer usuario
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete User Modal -->
+<dialog #deleteUserDialog class="confirm-dialog" (click)="cancelDeleteUser()" (cancel)="cancelDeleteUser()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="material-symbols-outlined modal-icon">delete_forever</span>
+      <h2 class="modal-title">¿Desactivar usuario?</h2>
+    </div>
+    <div class="modal-body">
+      <p>Se desactivará la cuenta de <strong>{{ userToDelete?.nombre || userToDelete?.name }}</strong>. El usuario no podrá iniciar sesión, pero sus datos históricos se conservarán.</p>
+    </div>
+    <div class="modal-footer">
+      <button (click)="cancelDeleteUser()" class="btn-secondary" type="button">Cancelar</button>
+      <button (click)="confirmDeleteUser()" class="btn-danger" type="button">Eliminar</button>
+    </div>
+  </div>
+</dialog>
+<app-edit-user-dialog
+  [isOpen]="showEditDialog"
+  [usuario]="usuarioToEdit"
+  (closed)="onEditDialogClosed($event)"
+></app-edit-user-dialog>
+
+<div class="access-denied" *ngIf="currentRole !== 'ADMIN' && currentRole !== ''">
+  <span class="material-symbols-outlined">lock</span>
+  <p class="denied-title">Acceso denegado</p>
+  <p class="denied-text">No tienes permiso para acceder a esta página</p>
+</div>

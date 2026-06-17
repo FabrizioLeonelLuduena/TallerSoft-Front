@@ -1,0 +1,77 @@
+<div class="layout-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <!-- Logo Section -->
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-icon-wrapper">
+          <span class="material-symbols-outlined logo-icon">build</span>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">TallerSoft</span>
+          <span class="logo-version">v1.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Items -->
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of getVisibleNavItems()"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: false }"
+         class="nav-item"
+         [title]="sidebarCollapsed ? item.label : ''">
+        <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+
+      <!-- Chat History -->
+      <div class="chat-history" *ngIf="!sidebarCollapsed && chatSessions.length > 0">
+        <div class="chat-history-header">
+          <span class="material-symbols-outlined chat-history-header-icon">history</span>
+          <span class="chat-history-label">Conversaciones recientes</span>
+        </div>
+        <div class="chat-history-list">
+          <div
+            class="chat-history-item"
+            *ngFor="let session of chatSessions"
+            [class.active]="session.id === currentSessionId"
+            (click)="navigateToSession(session.id)">
+            <span class="material-symbols-outlined chat-history-icon">chat_bubble_outline</span>
+            <span class="chat-history-title">{{ session.title }}</span>
+            <div class="chat-history-menu-wrap" (click)="$event.stopPropagation()">
+              <button
+                class="chat-history-dots"
+                (click)="toggleSessionMenu(session.id, $event)"
+                title="Opciones">
+                <span class="material-symbols-outlined">more_vert</span>
+              </button>
+              <div class="chat-history-dropdown" *ngIf="openMenuId === session.id">
+                <button class="chat-dropdown-item delete-action" (click)="deleteSession(session.id, $event)">
+                  <span class="material-symbols-outlined">delete</span>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-area">
+    <!-- Global Top Bar -->
+    <app-top-bar></app-top-bar>
+
+    <!-- Content Area -->
+    <main class="content-area page-enter">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<!-- Chat Flotante (disponible en todas las páginas) -->
+<app-chat-flotante></app-chat-flotante>

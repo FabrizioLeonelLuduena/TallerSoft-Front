@@ -1,0 +1,164 @@
+<div class="create-container page-enter">
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+    <div class="form-card">
+    <!-- Sección 1 -->
+    <section class="form-section">
+      <h2 class="section-title">Información del Repuesto</h2>
+
+      <div class="form-grid">
+        <div class="form-column">
+          <div class="form-field">
+            <label for="nombre" class="field-label">
+              Nombre <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              class="ts-input"
+              formControlName="nombre"
+              placeholder="Ej: Pantalla OLED iPhone 13"
+              [class.error]="nombreControl?.invalid && nombreControl?.touched"
+            />
+            <div class="error-text" *ngIf="nombreControl?.invalid && nombreControl?.touched">
+              El nombre es requerido
+            </div>
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-field">
+            <label for="categoria" class="field-label">Categoría</label>
+            <input
+              type="text"
+              id="categoria"
+              class="ts-input"
+              formControlName="categoria"
+              placeholder="Ej: Pantallas, Baterías, Cables..."
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 2 -->
+    <section class="form-section">
+      <h2 class="section-title">Stock y Precio</h2>
+
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label for="precio" class="field-label">
+            Precio <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="precio"
+            class="ts-input"
+            formControlName="precio"
+            placeholder="Ej: 45000"
+            min="0"
+            step="0.01"
+            [class.error]="precioControl?.invalid && precioControl?.touched"
+          />
+          <div class="error-text" *ngIf="precioControl?.hasError('required') && precioControl?.touched">
+            El precio es requerido
+          </div>
+          <div class="error-text" *ngIf="precioControl?.hasError('min') && precioControl?.touched">
+            El precio debe ser mayor a 0
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="stockActual" class="field-label">
+            Stock Actual <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="stockActual"
+            class="ts-input"
+            formControlName="stockActual"
+            placeholder="Ej: 10"
+            min="0"
+            step="1"
+            [class.error]="stockActualControl?.invalid && stockActualControl?.touched"
+          />
+          <div class="error-text" *ngIf="stockActualControl?.hasError('required') && stockActualControl?.touched">
+            El stock actual es requerido
+          </div>
+          <div class="error-text" *ngIf="stockActualControl?.hasError('min') && stockActualControl?.touched">
+            El stock no puede ser negativo
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label for="stockMinimo" class="field-label">
+            Stock Mínimo (Crítico) <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="stockMinimo"
+            class="ts-input"
+            formControlName="stockMinimo"
+            placeholder="Ej: 5"
+            min="0"
+            step="1"
+            [class.error]="stockMinimoControl?.invalid && stockMinimoControl?.touched"
+          />
+          <div class="error-text" *ngIf="stockMinimoControl?.hasError('required') && stockMinimoControl?.touched">
+            El stock mínimo es requerido
+          </div>
+          <div class="error-text" *ngIf="stockMinimoControl?.hasError('min') && stockMinimoControl?.touched">
+            El stock mínimo no puede ser negativo
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="stockBajo" class="field-label">
+            Stock Bajo (Alerta) <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="stockBajo"
+            class="ts-input"
+            formControlName="stockBajo"
+            placeholder="Ej: 10"
+            min="0"
+            step="1"
+            [class.error]="stockBajoControl?.invalid && stockBajoControl?.touched"
+          />
+          <div class="error-text" *ngIf="stockBajoControl?.hasError('required') && stockBajoControl?.touched">
+            El umbral de alerta es requerido
+          </div>
+          <div class="error-text" *ngIf="stockBajoControl?.hasError('min') && stockBajoControl?.touched">
+            No puede ser negativo
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <p class="text-small-loose" style="color: var(--color-secondary); margin: 0; padding: var(--spacing-md); background: rgba(0, 245, 212, 0.04); border: 1px solid rgba(0, 245, 212, 0.1); border-radius: var(--radius-md);">
+          <strong>Alerta de bajo stock</strong> cuando el stock actual sea menor o igual al umbral de alerta.
+          <strong>Alerta crítica</strong> cuando sea menor o igual al stock mínimo.
+        </p>
+      </div>
+    </section>
+
+    <!-- Acciones -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button type="submit" class="ts-btn-primary" [disabled]="form.invalid || isLoading">
+        <span *ngIf="!isLoading">Guardar Repuesto</span>
+        <span *ngIf="isLoading" class="loading-state">
+          <span class="material-symbols-outlined loading-icon">hourglass_empty</span>
+          Guardando...
+        </span>
+      </button>
+    </div>
+    </div>
+
+  </form>
+</div>

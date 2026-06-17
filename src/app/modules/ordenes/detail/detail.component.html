@@ -1,0 +1,261 @@
+<div class="detail-wrapper" *ngIf="!isLoading; else loadingState">
+
+  <!-- Back Button -->
+  <button class="btn-back" (click)="navigateBack()">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Volver
+  </button>
+
+  <!-- Header Card -->
+  <div class="header-card" *ngIf="orden">
+    <div class="header-left">
+      <div class="order-id">{{ padOrderId(orden.id) }}</div>
+      <h1 class="client-name">{{ orden.clienteNombre }}</h1>
+      <div class="header-meta">
+        <span class="material-symbols-outlined meta-icon">devices</span>
+        <span>Equipo #{{ orden.equipoId }}</span>
+        <span class="meta-sep">·</span>
+        <span>Creada {{ getRelativeTime(orden.createdAt) }}</span>
+        <span class="meta-sep">·</span>
+        <span>Actualizada {{ getRelativeTime(orden.updatedAt) }}</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-badges">
+        <span class="estado-chip" [style.background-color]="getEstadoBgColor(orden.estado)" [style.color]="getEstadoColor(orden.estado)">
+          {{ orden.estado }}
+        </span>
+        <span class="prioridad-chip" [style.color]="getPrioridadColor(orden.prioridad)">
+          {{ orden.prioridad }}
+        </span>
+      </div>
+      <div class="presupuesto-block">
+        <span class="presupuesto-label">Total</span>
+        <div class="presupuesto-value">{{ formatCurrency(orden.presupuesto) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid" *ngIf="orden">
+
+    <!-- LEFT COLUMN: Área Técnica (70%) -->
+    <div class="left-col">
+
+      <!-- Diagnóstico -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Diagnóstico</h3>
+        </div>
+        <textarea
+          *ngIf="isDiagnosticoEditable()"
+          [(ngModel)]="diagnosticoText"
+          placeholder="Describí el diagnóstico..."
+          class="diagnostico-textarea"
+        ></textarea>
+        <textarea
+          *ngIf="isDiagnosticoDisabledInput()"
+          [value]="diagnosticoText"
+          class="diagnostico-textarea diagnostico-textarea--disabled"
+          disabled
+          placeholder="Sin diagnóstico registrado"
+        ></textarea>
+        <div *ngIf="!isDiagnosticoEditable() && !isDiagnosticoDisabledInput() && diagnosticoText" class="diagnostico-readonly">
+          {{ diagnosticoText }}
+        </div>
+        <div *ngIf="!isDiagnosticoEditable() && !isDiagnosticoDisabledInput() && !diagnosticoText" class="empty-state">
+          Sin diagnóstico registrado
+        </div>
+        <button *ngIf="isDiagnosticoEditable()" class="btn-save" (click)="onSaveDiagnostico()" [disabled]="isSavingDiagnostico">
+          {{ isSavingDiagnostico ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button *ngIf="isDiagnosticoDisabledInput() && orden?.estado !== 'LISTO'" class="btn-save btn-edit" (click)="onToggleEditDiagnostico()">
+          Editar
+        </button>
+      </div>
+
+      <!-- Repuestos Utilizados -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Repuestos Utilizados</h3>
+          <button *ngIf="canSaveDiagnostico()" class="btn-agregar" (click)="openAddRepuestoDialog()">
+            <span class="material-symbols-outlined">add</span>
+            Agregar
+          </button>
+        </div>
+
+        <div class="repuestos-table" *ngIf="orden.repuestos && orden.repuestos.length > 0">
+          <div class="table-header">
+            <div class="col col-nombre">Repuesto</div>
+            <div class="col col-cantidad">Cant.</div>
+            <div class="col col-precio">Precio Unit.</div>
+            <div class="col col-total">Total</div>
+            <div class="col col-actions" *ngIf="canSaveDiagnostico()"></div>
+          </div>
+          <div class="table-row" *ngFor="let repuesto of orden.repuestos">
+            <div class="col col-nombre">{{ repuesto.nombreRepuesto }}</div>
+            <div class="col col-cantidad">{{ repuesto.cantidad }}</div>
+            <div class="col col-precio">{{ formatCurrency(repuesto.precioUnit) }}</div>
+            <div class="col col-total">{{ formatCurrency(repuesto.cantidad * repuesto.precioUnit) }}</div>
+            <div class="col col-actions" *ngIf="canSaveDiagnostico()">
+              <button class="btn-remove" (click)="onRemoveRepuesto(repuesto.id)" title="Eliminar">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!orden.repuestos || orden.repuestos.length === 0" class="empty-state">
+          Sin repuestos registrados
+        </div>
+      </div>
+
+      <!-- Cobro Pendiente (solo ADMIN/RECEPCION cuando estado = LISTO) -->
+      <div class="card card--cobro" *ngIf="orden.estado === 'LISTO' && canRegistrarCobro()">
+        <div class="card-header">
+          <h3 class="card-title">Cobro Pendiente</h3>
+        </div>
+        <p class="cobro-hint">La orden está lista para ser entregada. Registrá el cobro para completar el proceso.</p>
+        <a class="btn-cobrar" [routerLink]="['/caja/cobrar', orden.id]">
+          <span class="material-symbols-outlined">payments</span>
+          Registrar cobro
+        </a>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Sidebar de Gestión (30%) -->
+    <div class="right-col">
+
+      <!-- Cambiar Estado -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Cambiar Estado</h3>
+        </div>
+        <div class="current-estado">
+          <span class="label">Estado actual:</span>
+          <span class="value" [style.color]="getEstadoColor(orden.estado)">{{ orden.estado }}</span>
+        </div>
+        <button
+          *ngIf="canChangeEstado()"
+          class="btn-estado-change"
+          (click)="onChangeEstado()"
+          [disabled]="isChangeEstadoDisabled()"
+          [title]="isChangeEstadoDisabled() ? 'Agregá un diagnóstico antes de continuar' : ''"
+        >
+          {{ getNextEstadoLabel(orden.estado) }} →
+        </button>
+        <div *ngIf="isChangeEstadoDisabled()" class="state-hint">
+          ⓘ Agregá un diagnóstico antes de continuar
+        </div>
+
+        <ng-container *ngIf="canCancelar()">
+          <button
+            *ngIf="!showCancelConfirm"
+            class="btn-cancelar-orden"
+            (click)="onCancelarOrden()"
+          >
+            <span class="material-symbols-outlined">cancel</span>
+            Cancelar orden
+          </button>
+          <div *ngIf="showCancelConfirm" class="cancel-confirm-box">
+            <p class="cancel-confirm-text">¿Confirmar cancelación? Se devolverá el stock de repuestos.</p>
+            <div class="cancel-confirm-actions">
+              <button class="btn-cancel-no" (click)="onDismissCancelar()" [disabled]="isCancelling">No</button>
+              <button class="btn-cancel-yes" (click)="onConfirmCancelar()" [disabled]="isCancelling">
+                {{ isCancelling ? 'Cancelando...' : 'Sí, cancelar' }}
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Historial -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Historial</h3>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item" [class.completed]="isCompleted('PENDIENTE')" [class.current]="isCurrent('PENDIENTE')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-line"></div>
+            <div class="timeline-content">
+              <p class="timeline-label">Pendiente</p>
+              <span class="timeline-date">{{ orden.createdAt | date: 'dd/MM HH:mm' }}</span>
+            </div>
+          </div>
+          <div class="timeline-item" [class.completed]="isCompleted('EN_PROCESO')" [class.current]="isCurrent('EN_PROCESO')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-line"></div>
+            <div class="timeline-content">
+              <p class="timeline-label">En Proceso</p>
+              <span class="timeline-date" *ngIf="orden.estado !== 'PENDIENTE'">{{ orden.updatedAt | date: 'dd/MM HH:mm' }}</span>
+            </div>
+          </div>
+          <div class="timeline-item" [class.completed]="isCompleted('LISTO')" [class.current]="isCurrent('LISTO')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-line"></div>
+            <div class="timeline-content">
+              <p class="timeline-label">Listo</p>
+              <span class="timeline-date" *ngIf="orden.estado !== 'PENDIENTE' && orden.estado !== 'EN_PROCESO'">{{ orden.updatedAt | date: 'dd/MM HH:mm' }}</span>
+            </div>
+          </div>
+          <div class="timeline-item" [class.completed]="isCompleted('ENTREGADO')" [class.current]="isCurrent('ENTREGADO')">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <p class="timeline-label">Entregada</p>
+              <span class="timeline-date" *ngIf="orden.estado === 'ENTREGADO'">{{ orden.updatedAt | date: 'dd/MM HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Presupuesto / Orden PDF -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ orden.estado === 'PENDIENTE' ? 'Presupuesto' : 'Orden' }}</h3>
+        </div>
+        <div class="pdf-actions">
+          <button class="btn-pdf btn-pdf--preview" (click)="previsualizarPDF()" [disabled]="isPdfLoading">
+            <span class="material-symbols-outlined">visibility</span>
+            {{ isPdfLoading ? 'Generando...' : (orden.estado === 'PENDIENTE' ? 'Ver presupuesto' : 'Ver orden') }}
+          </button>
+          <button class="btn-pdf btn-pdf--download" (click)="descargarPDF()">
+            <span class="material-symbols-outlined">download</span>
+            Descargar PDF
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PDF Modal Overlay -->
+<div class="pdf-modal-overlay" *ngIf="showPdfPreview" (click)="cerrarPdfPreview()">
+  <div class="pdf-modal" (click)="$event.stopPropagation()">
+    <div class="pdf-modal-header">
+      <span class="pdf-modal-title">{{ orden!.estado === 'PENDIENTE' ? 'Presupuesto' : 'Orden' }} {{ padOrderId(orden!.id) }}</span>
+      <button class="pdf-modal-close" (click)="cerrarPdfPreview()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <iframe [src]="pdfUrl" class="pdf-iframe" frameborder="0"></iframe>
+  </div>
+</div>
+
+<!-- Loading State -->
+<ng-template #loadingState>
+  <div class="loading-state">
+    <div class="skeleton-header"></div>
+    <div class="skeleton-grid">
+      <div class="skeleton-left">
+        <div class="skeleton-section"></div>
+        <div class="skeleton-section"></div>
+      </div>
+      <div class="skeleton-right">
+        <div class="skeleton-section"></div>
+        <div class="skeleton-section"></div>
+      </div>
+    </div>
+  </div>
+</ng-template>

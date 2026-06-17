@@ -1,0 +1,248 @@
+<div class="create-container page-enter">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+    <div class="form-card">
+    <!-- SECTION 1: Cliente y Equipo -->
+    <section class="form-section">
+      <h2 class="section-title">Cliente y Equipo</h2>
+
+      <div class="form-grid">
+        <!-- Cliente -->
+        <div class="form-column">
+          <div class="form-group">
+            <label class="field-label">
+              Cliente <span class="required">*</span>
+            </label>
+            <div class="search-wrapper">
+              <span class="material-symbols-outlined search-icon">person_search</span>
+              <input
+                type="text"
+                class="ts-input search-input"
+                placeholder="Buscar cliente..."
+                [(ngModel)]="clienteSearchTerm"
+                (focus)="onClienteFocus()"
+                (input)="onClienteSearch($event)"
+                (blur)="onClienteBlur()"
+                [ngModelOptions]="{ standalone: true }"
+                autocomplete="off"
+              />
+              <div class="dropdown" *ngIf="showClienteDropdown && clientes.length > 0">
+                <div
+                  class="dropdown-item"
+                  *ngFor="let cliente of clientes"
+                  (click)="onClienteSelect(cliente)"
+                  [class.selected]="selectedCliente?.id === cliente.id"
+                >
+                  <div class="dropdown-item-content">
+                    <div class="item-nombre">{{ cliente.nombre }}</div>
+                    <div class="item-sub" *ngIf="cliente.email">{{ cliente.email }}</div>
+                  </div>
+                  <span class="material-symbols-outlined item-check" *ngIf="selectedCliente?.id === cliente.id">check</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Equipo -->
+        <div class="form-column">
+          <div class="form-group">
+            <label class="field-label">
+              Equipo <span class="required">*</span>
+            </label>
+            <div class="search-wrapper" [class.field-disabled]="!selectedCliente || isLoadingEquipos">
+              <span class="material-symbols-outlined search-icon">devices</span>
+              <input
+                type="text"
+                class="ts-input search-input"
+                [placeholder]="!selectedCliente ? 'Primero seleccioná un cliente' : isLoadingEquipos ? 'Cargando equipos...' : 'Buscar equipo...'"
+                [(ngModel)]="equipoSearchTerm"
+                (focus)="onEquipoFocus()"
+                (input)="onEquipoSearch($event)"
+                (blur)="onEquipoBlur()"
+                [ngModelOptions]="{ standalone: true }"
+                [disabled]="!selectedCliente || isLoadingEquipos"
+                autocomplete="off"
+              />
+              <div class="dropdown" *ngIf="showEquipoDropdown && filteredEquipos.length > 0">
+                <div
+                  class="dropdown-item"
+                  *ngFor="let eq of filteredEquipos"
+                  (click)="onEquipoSelect(eq)"
+                  [class.selected]="selectedEquipo?.id === eq.id"
+                >
+                  <div class="dropdown-item-content">
+                    <div class="item-nombre">{{ eq.tipo }}</div>
+                    <div class="item-sub" *ngIf="eq.marca || eq.modelo">{{ eq.marca }} {{ eq.modelo }}</div>
+                  </div>
+                  <span class="material-symbols-outlined item-check" *ngIf="selectedEquipo?.id === eq.id">check</span>
+                </div>
+              </div>
+            </div>
+            <div class="error-text" *ngIf="equipoIdControl?.invalid && equipoIdControl?.touched">
+              El equipo es requerido
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Detalles -->
+    <section class="form-section">
+      <h2 class="section-title">Detalles</h2>
+
+      <div class="form-grid">
+        <!-- Técnico -->
+        <div class="form-column">
+          <div class="form-group">
+            <label class="field-label">Técnico</label>
+
+            <!-- Solo lectura para técnico logueado -->
+            <div class="search-wrapper field-disabled" *ngIf="isTecnico">
+              <span class="material-symbols-outlined search-icon">engineering</span>
+              <input
+                type="text"
+                class="ts-input search-input"
+                [value]="tecnicoSearchTerm"
+                [disabled]="true"
+                autocomplete="off"
+              />
+            </div>
+
+            <!-- Selector interactivo para admin/recepción -->
+            <div class="search-wrapper" *ngIf="!isTecnico">
+              <span class="material-symbols-outlined search-icon">engineering</span>
+              <input
+                type="text"
+                class="ts-input search-input"
+                placeholder="Sin asignar"
+                [(ngModel)]="tecnicoSearchTerm"
+                (focus)="onTecnicoFocus()"
+                (input)="onTecnicoSearch($event)"
+                (blur)="onTecnicoBlur()"
+                [ngModelOptions]="{ standalone: true }"
+                autocomplete="off"
+              />
+              <div class="dropdown" *ngIf="showTecnicoDropdown">
+                <div
+                  class="dropdown-item"
+                  (click)="onTecnicoSelect(null)"
+                  [class.selected]="!selectedTecnico"
+                >
+                  <div class="dropdown-item-content">
+                    <div class="item-nombre muted">Sin asignar</div>
+                  </div>
+                  <span class="material-symbols-outlined item-check" *ngIf="!selectedTecnico">check</span>
+                </div>
+                <div
+                  class="dropdown-item"
+                  *ngFor="let tec of filteredTecnicos"
+                  (click)="onTecnicoSelect(tec)"
+                  [class.selected]="selectedTecnico?.id === tec.id"
+                >
+                  <div class="dropdown-item-content">
+                    <div class="item-nombre">{{ tec.nombre }}</div>
+                  </div>
+                  <span class="material-symbols-outlined item-check" *ngIf="selectedTecnico?.id === tec.id">check</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Presupuesto -->
+        <div class="form-column">
+          <div class="form-group">
+            <label class="field-label">Presupuesto (Opcional)</label>
+            <div class="input-prefix-wrapper">
+              <span class="prefix">$</span>
+              <input
+                type="number"
+                class="ts-input"
+                formControlName="presupuesto"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Prioridad -->
+    <section class="form-section">
+      <h2 class="section-title">Prioridad</h2>
+
+      <div class="selection-card-group">
+        <button
+          type="button"
+          class="selection-card"
+          [class.active]="form.get('prioridad')?.value === 'BAJA'"
+          (click)="selectPrioridad('BAJA')"
+        >
+          <span class="card-label">Baja</span>
+          <span class="material-symbols-outlined">trending_down</span>
+        </button>
+
+        <button
+          type="button"
+          class="selection-card"
+          [class.active]="form.get('prioridad')?.value === 'NORMAL'"
+          (click)="selectPrioridad('NORMAL')"
+        >
+          <span class="card-label">Normal</span>
+          <span class="material-symbols-outlined">trending_flat</span>
+        </button>
+
+        <button
+          type="button"
+          class="selection-card"
+          [class.active]="form.get('prioridad')?.value === 'ALTA'"
+          (click)="selectPrioridad('ALTA')"
+        >
+          <span class="card-label">Alta</span>
+          <span class="material-symbols-outlined">trending_up</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Falla -->
+    <section class="form-section">
+      <h2 class="section-title">Descripción del Problema</h2>
+
+      <div class="form-group">
+        <label class="field-label">
+          Falla Reportada <span class="required">*</span>
+        </label>
+        <textarea
+          class="ts-input textarea-input"
+          formControlName="fallaReportada"
+          placeholder="Describí el problema en detalle..."
+          rows="5"
+        ></textarea>
+        <div class="error-text" *ngIf="fallaReportadaControl?.invalid && fallaReportadaControl?.touched">
+          La falla reportada es requerida
+        </div>
+      </div>
+    </section>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="navigateBack()">
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="ts-btn-primary"
+        [disabled]="form.invalid || isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Crear Orden</span>
+        <span *ngIf="isSubmitting" class="loading-state">
+          <span class="material-symbols-outlined loading-icon">hourglass_empty</span>
+          Creando...
+        </span>
+      </button>
+    </div>
+    </div>
+  </form>
+</div>

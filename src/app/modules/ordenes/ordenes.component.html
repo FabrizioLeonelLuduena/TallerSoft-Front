@@ -1,0 +1,103 @@
+<div class="ordenes-principal-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-actions">
+      <!-- View Mode Toggle -->
+      <div class="view-toggle">
+        <button
+          class="toggle-btn"
+          [class.active]="viewMode === 'kanban'"
+          (click)="switchViewMode('kanban')"
+          title="Vista Kanban"
+        >
+          <span class="material-symbols-outlined">view_column</span>
+        </button>
+        <button
+          class="toggle-btn"
+          [class.active]="viewMode === 'lista'"
+          (click)="switchViewMode('lista')"
+          title="Vista Lista"
+        >
+          <span class="material-symbols-outlined">table_rows</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control Bar -->
+  <div class="control-bar">
+    <!-- Search -->
+    <div class="search-input-wrapper">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input
+        type="text"
+        class="search-input ts-input"
+        [placeholder]="isTecnico ? 'Buscar por #, cliente o falla...' : 'Buscar por #, cliente, falla o técnico...'"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+      />
+    </div>
+
+    <!-- Técnico Filter (solo ADMIN y RECEPCION) -->
+    <select
+      *ngIf="!isTecnico"
+      class="filter-select ts-input"
+      [(ngModel)]="selectedTecnicoId"
+      (change)="applyFilters()"
+    >
+      <option [value]="null">Técnico</option>
+      <option *ngFor="let tec of tecnicos" [value]="tec.id">
+        {{ tec.nombre }}
+      </option>
+    </select>
+
+    <!-- Prioridad Filter -->
+    <select
+      class="filter-select ts-input"
+      [(ngModel)]="selectedPrioridad"
+      (change)="applyFilters()"
+    >
+      <option value="">Prioridad</option>
+      <option *ngFor="let pri of prioridades" [value]="pri">
+        {{ pri }}
+      </option>
+    </select>
+
+    <!-- Estado Filter (solo vista lista) -->
+    <select
+      *ngIf="viewMode === 'lista'"
+      class="filter-select ts-input"
+      [(ngModel)]="selectedEstado"
+      (change)="applyFilters()"
+    >
+      <option value="">Estado</option>
+      <option *ngFor="let estado of estados" [value]="estado">
+        {{ formatEstado(estado) }}
+      </option>
+    </select>
+
+    <!-- Create Button -->
+    <button *ngIf="canCreateOrden()" class="btn-create" (click)="navigateToCreate()">
+      +
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content-area">
+    <!-- Kanban View -->
+    <div 
+      *ngIf="viewMode === 'kanban'"
+      class="view-content view-transition-enter"
+    >
+      <app-kanban #kanbanChild></app-kanban>
+    </div>
+
+    <!-- Lista View -->
+    <div 
+      *ngIf="viewMode === 'lista'"
+      class="view-content view-transition-enter"
+    >
+      <app-ordenes-list #listaChild></app-ordenes-list>
+    </div>
+  </div>
+</div>

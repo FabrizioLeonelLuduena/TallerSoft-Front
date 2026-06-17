@@ -1,0 +1,164 @@
+<div class="create-container page-enter">
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content" autocomplete="off">
+    <div class="form-card">
+    <!-- Sección 1: Datos de acceso -->
+    <section class="form-section">
+      <h2 class="section-title">Datos de acceso</h2>
+
+      <div class="form-grid">
+        <div class="form-column">
+          <div class="form-field">
+            <label for="nombre" class="field-label">
+              Nombre completo <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              class="ts-input"
+              formControlName="nombre"
+              placeholder="Ej: Juan Pérez"
+              autocomplete="off"
+              [class.error]="nombreControl?.invalid && nombreControl?.touched"
+            />
+            <div class="error-text" *ngIf="nombreControl?.invalid && nombreControl?.touched">
+              El nombre es requerido
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="email" class="field-label">
+              Email <span class="required">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              class="ts-input"
+              formControlName="email"
+              placeholder="correo@ejemplo.com"
+              autocomplete="off"
+              [class.error]="emailControl?.invalid && emailControl?.touched"
+            />
+            <div class="error-text" *ngIf="emailControl?.invalid && emailControl?.touched">
+              {{ getEmailError() }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-field">
+            <label for="password" class="field-label">
+              Contraseña <span class="required">*</span>
+            </label>
+            <div class="password-wrapper">
+              <input
+                [type]="passwordVisible ? 'text' : 'password'"
+                id="password"
+                class="ts-input"
+                formControlName="password"
+                placeholder="Mínimo 8 caracteres"
+                autocomplete="new-password"
+                [class.error]="passwordControl?.invalid && passwordControl?.touched"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+                title="Mostrar/Ocultar contraseña"
+              >
+                <span class="material-symbols-outlined">{{ passwordVisible ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <div class="password-hint" [class.error]="passwordControl?.invalid && passwordControl?.touched">
+              {{ getPasswordHint() }}
+            </div>
+          </div>
+
+          <div class="info-card">
+            <span class="material-symbols-outlined info-icon">info</span>
+            <p>El usuario podrá cambiar su contraseña una vez que ingrese al sistema.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 2: Rol -->
+    <section class="form-section">
+      <h2 class="section-title">Rol del usuario</h2>
+
+      <div class="role-grid">
+        <div
+          class="role-card"
+          [class.role-card-selected]="selectedRole === 'ADMIN'"
+          (click)="selectRole('ADMIN')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="role-icon">
+            <span class="material-symbols-outlined">security</span>
+          </div>
+          <div class="role-content">
+            <p class="role-name">Admin</p>
+            <p class="role-desc">Control total del sistema, usuarios y configuración.</p>
+          </div>
+          <span class="role-check material-symbols-outlined" *ngIf="selectedRole === 'ADMIN'">check_circle</span>
+        </div>
+
+        <div
+          class="role-card"
+          [class.role-card-selected]="selectedRole === 'TECNICO'"
+          (click)="selectRole('TECNICO')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="role-icon">
+            <span class="material-symbols-outlined">build</span>
+          </div>
+          <div class="role-content">
+            <p class="role-name">Técnico</p>
+            <p class="role-desc">Acceso a órdenes de trabajo e inventario de repuestos.</p>
+          </div>
+          <span class="role-check material-symbols-outlined" *ngIf="selectedRole === 'TECNICO'">check_circle</span>
+        </div>
+
+        <div
+          class="role-card"
+          [class.role-card-selected]="selectedRole === 'RECEPCION'"
+          (click)="selectRole('RECEPCION')"
+          role="button"
+          tabindex="0"
+        >
+          <div class="role-icon">
+            <span class="material-symbols-outlined">support_agent</span>
+          </div>
+          <div class="role-content">
+            <p class="role-name">Recepción</p>
+            <p class="role-desc">Gestión de ingreso de clientes y seguimiento de órdenes.</p>
+          </div>
+          <span class="role-check material-symbols-outlined" *ngIf="selectedRole === 'RECEPCION'">check_circle</span>
+        </div>
+      </div>
+
+      <div class="error-text" *ngIf="rolControl?.invalid && rolControl?.touched">
+        Debe seleccionar un rol
+      </div>
+    </section>
+
+    <!-- Acciones -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        Cancelar
+      </button>
+      <button type="submit" class="ts-btn-primary" [disabled]="form.invalid || isLoading">
+        <span *ngIf="!isLoading">Crear Usuario</span>
+        <span *ngIf="isLoading" class="loading-state">
+          <span class="material-symbols-outlined loading-icon">hourglass_empty</span>
+          Creando...
+        </span>
+      </button>
+    </div>
+    </div>
+
+  </form>
+</div>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TallerSoft ERP - User Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0F1E;
+            color: #dee1f7;
+            margin: 0;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-dot-active {
+            box-shadow: 0 0 8px #00f5d4;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090e1c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2f3445;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#25293a",
+                      "error-container": "#93000a",
+                      "tertiary-container": "#c0def6",
+                      "surface-dim": "#0e1322",
+                      "tertiary-fixed": "#c8e6ff",
+                      "on-secondary-fixed-variant": "#3d484d",
+                      "surface-container-highest": "#2f3445",
+                      "on-primary": "#00382f",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-lowest": "#090e1c",
+                      "on-secondary-container": "#aebac0",
+                      "primary": "#d7fff3",
+                      "surface-container": "#1a1f2f",
+                      "secondary-fixed-dim": "#bcc8ce",
+                      "on-secondary-fixed": "#121d21",
+                      "tertiary": "#f1f7ff",
+                      "inverse-on-surface": "#2b3040",
+                      "surface-container-low": "#161b2b",
+                      "on-background": "#dee1f7",
+                      "on-primary-container": "#006c5c",
+                      "secondary": "#bcc8ce",
+                      "error": "#ffb4ab",
+                      "background": "#0e1322",
+                      "surface-variant": "#2f3445",
+                      "surface-bright": "#343949",
+                      "primary-fixed-dim": "#00dfc1",
+                      "on-error": "#690005",
+                      "secondary-fixed": "#d8e4ea",
+                      "on-tertiary-fixed": "#001e2e",
+                      "secondary-container": "#3f4b50",
+                      "surface": "#0e1322",
+                      "on-primary-fixed-variant": "#005144",
+                      "primary-fixed": "#26fedc",
+                      "tertiary-fixed-dim": "#accae2",
+                      "outline-variant": "#3a4a46",
+                      "on-tertiary-fixed-variant": "#2d4a5e",
+                      "inverse-primary": "#006b5b",
+                      "inverse-surface": "#dee1f7",
+                      "surface-tint": "#00dfc1",
+                      "primary-container": "#00f5d4",
+                      "on-tertiary": "#143346",
+                      "on-surface": "#dee1f7",
+                      "outline": "#83948f",
+                      "on-primary-fixed": "#00201a",
+                      "on-surface-variant": "#b9cac4",
+                      "on-tertiary-container": "#466277",
+                      "on-secondary": "#273237"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "40px",
+                      "margin": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "label-sm": ["10px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background">
+<!-- Sidebar Navigation -->
+<aside class="w-[240px] h-screen fixed left-0 top-0 bg-surface-container-lowest border-r border-white/5 shadow-xl flex flex-col py-lg z-50">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-xl">precision_manufacturing</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-black text-primary tracking-tight">TallerSoft</h1>
+<p class="text-secondary font-label-md text-[10px] uppercase tracking-widest opacity-60">Mission Control</p>
+</div>
+</div>
+</div>
+<nav class="flex-grow space-y-xs">
+<a class="flex items-center gap-md text-secondary py-sm px-lg hover:text-on-surface hover:bg-white/5 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md text-secondary py-sm px-lg hover:text-on-surface hover:bg-white/5 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="font-label-md text-label-md">Work Orders</span>
+</a>
+<a class="flex items-center gap-md text-secondary py-sm px-lg hover:text-on-surface hover:bg-white/5 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Inventory</span>
+</a>
+<a class="flex items-center gap-md text-secondary py-sm px-lg hover:text-on-surface hover:bg-white/5 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-md text-label-md">Fleet Management</span>
+</a>
+<a class="flex items-center gap-md text-secondary py-sm px-lg hover:text-on-surface hover:bg-white/5 transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<div class="pt-lg mt-lg border-t border-white/5">
+<!-- Users Tab - Active State -->
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-sm px-lg active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</a>
+</div>
+</nav>
+<div class="mt-auto px-lg flex flex-col gap-sm">
+<button class="w-full py-sm bg-primary-container text-on-primary rounded-lg font-label-md text-label-md font-bold transition-all hover:brightness-110 active:scale-95">
+                New Work Order
+            </button>
+<div class="flex flex-col mt-md">
+<a class="flex items-center gap-md text-secondary py-xs hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-label-md text-[11px]">Support</span>
+</a>
+<a class="flex items-center gap-md text-secondary py-xs hover:text-error transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span class="font-label-md text-[11px]">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-[240px] min-h-screen">
+<!-- Top Bar -->
+<header class="w-full h-[60px] sticky top-0 bg-surface/80 backdrop-blur-xl border-b border-white/10 z-40 flex justify-between items-center px-lg">
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-secondary/60 text-sm">search</span>
+<input class="bg-surface-container-low border border-white/5 rounded-full pl-lg pr-md py-xs text-body-sm w-64 focus:outline-none focus:border-primary/50 transition-all text-on-surface" placeholder="Search system commands..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md">
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-8 w-px bg-white/10 mx-xs"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Admin User</p>
+<p class="font-label-sm text-[10px] text-secondary/60 uppercase">System Root</p>
+</div>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-primary/20" data-alt="A professional close-up portrait of a tech-savvy male administrator in a high-tech environment. The lighting is cold and cinematic, with subtle cyan rim lighting reflecting off a sleek, dark background. He wears a minimalist black tactical sweater. The overall aesthetic is futuristic and sharp, maintaining the TallerSoft deep abyss and frost color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgOf-ydXgtPsxyKgB-RXktrfSVw4mtdtL0Gu09Qg4fIq8kRAzwb7kJZJIZySSNKCTsca6ik_zqY3O6G050K2ZNRdt7RbpDT2lmVoLdbj3yeZY4IxeRcC3uKGBshmLr8m2txEqInbonpbQXhyppJ4g-7EJzmeRKcG41FIB5klKcXU4Bsn8pGH1LZD0LsAM1aFVgjnNNk37wKhY8h8U9BB8WrR1GEb5xw12MP7kZtTDRpFlTtqKmwfBDa6nVJUbgmxEwLigYXdWb3d0"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-lg">
+<!-- Breadcrumbs & Actions -->
+<div class="flex justify-between items-end mb-lg">
+<div>
+<nav class="flex text-label-sm text-secondary/40 gap-xs mb-xs uppercase tracking-widest">
+<span>System</span>
+<span>/</span>
+<span class="text-primary/60">User Administration</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">User Management</h2>
+</div>
+<button class="flex items-center gap-sm bg-primary-container px-lg py-sm rounded-lg text-on-primary font-bold transition-all hover:shadow-[0_0_20px_rgba(0,245,212,0.3)] active:scale-95">
+<span class="material-symbols-outlined text-sm">person_add</span>
+<span>Nuevo Usuario</span>
+</button>
+</div>
+<!-- Stats Overview - Micro Cards -->
+<div class="grid grid-cols-4 gap-gutter mb-lg">
+<div class="glass-panel p-md rounded-xl">
+<p class="text-secondary/60 font-label-md text-[11px] uppercase tracking-wider">Total Users</p>
+<p class="text-headline-md font-black text-on-surface">42</p>
+</div>
+<div class="glass-panel p-md rounded-xl">
+<p class="text-secondary/60 font-label-md text-[11px] uppercase tracking-wider">Active Now</p>
+<div class="flex items-center gap-sm">
+<p class="text-headline-md font-black text-primary">12</p>
+<span class="w-2 h-2 rounded-full bg-primary-container status-dot-active animate-pulse"></span>
+</div>
+</div>
+<div class="glass-panel p-md rounded-xl">
+<p class="text-secondary/60 font-label-md text-[11px] uppercase tracking-wider">Pending Invites</p>
+<p class="text-headline-md font-black text-on-secondary-container">5</p>
+</div>
+<div class="glass-panel p-md rounded-xl border-error/20">
+<p class="text-error/60 font-label-md text-[11px] uppercase tracking-wider">Restricted</p>
+<p class="text-headline-md font-black text-error">2</p>
+</div>
+</div>
+<!-- Users Table Container -->
+<div class="glass-panel rounded-xl overflow-hidden">
+<!-- Table Toolbar -->
+<div class="px-lg py-md border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+<div class="flex gap-md">
+<button class="flex items-center gap-xs px-sm py-xs rounded border border-white/10 text-label-md text-secondary hover:bg-white/5">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filter
+                        </button>
+<button class="flex items-center gap-xs px-sm py-xs rounded border border-white/10 text-label-md text-secondary hover:bg-white/5">
+<span class="material-symbols-outlined text-sm">sort</span>
+                            Sort
+                        </button>
+</div>
+<p class="text-label-sm text-secondary/40 italic">Viewing 42 of 42 users</p>
+</div>
+<!-- Table Content -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-white/10">
+<th class="px-lg py-md font-label-md text-label-md text-secondary/60 uppercase tracking-widest">User Identity</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary/60 uppercase tracking-widest">Email Address</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary/60 uppercase tracking-widest">Role Type</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary/60 uppercase tracking-widest text-center">Connectivity</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary/60 uppercase tracking-widest text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="User Avatar" class="w-10 h-10 rounded-lg object-cover border border-white/10" data-alt="Close-up portrait of a male technician in his late 30s wearing a high-performance grey work vest. He has a focused expression. The background is a blurred high-tech automotive workshop with cool ambient lighting. Precision and technical expertise are conveyed through sharp focus and deep shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFZgajiD0jtnx3HN_WIgcg7vqqbfwWQP8zRgYiGHYvVDqyH_vdKY5uyyUWNPETBsygZN1SyvZenrVJMirHyuEM43FaxV5Wipf_fZ1I-JOJd9_cvlmO8DsNZRCOviMNBt3CmUWe3tg1knMgKwoPE9EaVhL53y38ZlTV2mxRnTlsUasAfoPoOlbmVZpARVj1fplKkU8WeZeQZ-cTLVYQbwaHh_PCBsz-nbVLwMENJtVBRKjnJH1z_EUiLPLL8IKjCu_5Z-4afXxE0Os"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background status-dot-active"></div>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Carlos Mendez</p>
+<p class="font-body-sm text-[11px] text-secondary/60">ID: TS-9921</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md font-body-sm text-secondary/80">c.mendez@tallersoft.erp</td>
+<td class="px-lg py-md">
+<span class="inline-flex items-center px-sm py-xs rounded bg-surface-container-highest border border-primary/20 text-primary font-label-sm uppercase">Técnico</span>
+</td>
+<td class="px-lg py-md text-center">
+<span class="text-primary-fixed-dim font-label-sm text-[10px] tracking-widest">ONLINE</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-xs text-secondary/40 hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-xs text-secondary/40 hover:text-error transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">block</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="User Avatar" class="w-10 h-10 rounded-lg object-cover border border-white/10" data-alt="Portrait of a female professional in a modern office, wearing a headset and smiling subtly. Her attire is professional and sharp. The setting is a bright, modern control center with large monitors showing data in the background, out of focus. Lighting is clean and cool-toned, dominated by icy blues and deep navies." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmRi8MfZzttTwSQqvDaWflYjB38VUVVvYzKWGuF0Lwj60YlPuPVPzDd0DGZDuiglD45pPCbmo_6wcDj3dxz1TUUCMGfsFftYv46sv0sQKamtEI79CNCkcJnXJPsmZ5cRnuLe2hSOu0Fxy39RPeuB4jTzDKgi5TfFKwHH4u7fHFNKnUn59V2LjrPaFVRZjYYlBTMJKiysPeQUJBvtGtWz3rQnogC9dQPb3nxemrCalByQBpkw93OJUAUvOfWBRku6M303yIXtgD2eA"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background status-dot-active"></div>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Elena Suarez</p>
+<p class="font-body-sm text-[11px] text-secondary/60">ID: TS-8812</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md font-body-sm text-secondary/80">e.suarez@tallersoft.erp</td>
+<td class="px-lg py-md">
+<span class="inline-flex items-center px-sm py-xs rounded bg-surface-container-highest border border-tertiary-fixed/20 text-tertiary-fixed-dim font-label-sm uppercase">Recepción</span>
+</td>
+<td class="px-lg py-md text-center">
+<span class="text-primary-fixed-dim font-label-sm text-[10px] tracking-widest">ONLINE</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-xs text-secondary/40 hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-xs text-secondary/40 hover:text-error transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">block</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="User Avatar" class="w-10 h-10 rounded-lg object-cover border border-white/10" data-alt="A portrait of a senior male administrator with a short gray beard, wearing a formal navy blue shirt. He has an authoritative and calm expression. The background consists of a server room with glowing blue and green indicator lights. The visual style is high-contrast, professional, and technologically advanced." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxgi9jH1__aUCHSJY9P0cY87ceOVRVZ4wjcHAVT4LMaKxaUaPdAhFZHBJF9Lgr8-FZjcvYda38Ds35RNWxfGxjPoGTdobbmfxR4Y5tD47xVyFEych4DM-pZ4kpH_O93-4fGA7FXNU2TO-zmg6IFEWM1LoTSzvmR3YoUaqUa0qxe24_1nZaZ7_48CExK1Y3anGku6FUYWe4ZincmBufl-5I60Q_-3jbxmHlET3U-hZ0KeB5VvWMVW7QvoP8ROUBCRbj8gJTgzVZy9o"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary rounded-full border-2 border-background"></div>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Ricardo Luna</p>
+<p class="font-body-sm text-[11px] text-secondary/60">ID: TS-0001</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md font-body-sm text-secondary/80">r.luna@tallersoft.erp</td>
+<td class="px-lg py-md">
+<span class="inline-flex items-center px-sm py-xs rounded bg-primary/20 border border-primary/40 text-primary-fixed font-label-sm uppercase">Admin</span>
+</td>
+<td class="px-lg py-md text-center">
+<span class="text-secondary/40 font-label-sm text-[10px] tracking-widest">OFFLINE</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-xs text-secondary/40 hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-xs text-secondary/40 hover:text-error transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">block</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="User Avatar" class="w-10 h-10 rounded-lg object-cover border border-white/10" data-alt="A portrait of a young female technician in a workshop setting, wearing a branded TallerSoft technical polo. She has her hair tied back and looks directly at the camera with confidence. The background is dominated by industrial tools and a cool, cinematic depth-of-field blur. Colors are strictly aligned with the abyss and cyan-teal palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDj6ZfeSlZ19i4N2DwO3HUlSO-JMUNn37wUklwXm2lGgPyhPYZk7XQ3UVudFr6HmsC9qfAbYDnOyxST4JVdGgbfAiXdbVppucDKHORd6vuCAfFmRQnTxevqe4P-lSOWCAVxxV0K-cOg2VuYIsLhhRfNTufVll4Apllx3a7EPyJ5xVv7KcDLC29CE28ZlV2ziyMRVWrFUPqrA9PMJXGORNq7R1yCZUkHKPTOScLXxcCtf6JbRz-vYQPf5QL8aiPSRFvQUvdSoE-EZhE"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background status-dot-active"></div>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Sofia Ortiz</p>
+<p class="font-body-sm text-[11px] text-secondary/60">ID: TS-9945</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md font-body-sm text-secondary/80">s.ortiz@tallersoft.erp</td>
+<td class="px-lg py-md">
+<span class="inline-flex items-center px-sm py-xs rounded bg-surface-container-highest border border-primary/20 text-primary font-label-sm uppercase">Técnico</span>
+</td>
+<td class="px-lg py-md text-center">
+<span class="text-primary-fixed-dim font-label-sm text-[10px] tracking-widest">ONLINE</span>
+</td>
+<td class="px-lg py-md text-right">
+<button class="p-xs text-secondary/40 hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-xs text-secondary/40 hover:text-error transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined">block</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-lg py-md bg-white/[0.01] border-t border-white/5 flex justify-between items-center">
+<p class="text-label-sm text-secondary/40 uppercase tracking-widest">Page 1 of 4</p>
+<div class="flex gap-sm">
+<button class="p-sm rounded bg-white/5 text-secondary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-sm rounded bg-white/5 text-secondary hover:text-primary">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Management Insights Grid -->
+<div class="grid grid-cols-12 gap-gutter mt-lg">
+<!-- Activity Log -->
+<div class="col-span-8 glass-panel rounded-xl p-lg">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recent System Activity</h3>
+<span class="material-symbols-outlined text-secondary/40">history</span>
+</div>
+<div class="space-y-md">
+<div class="flex items-start gap-md pb-md border-b border-white/5">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-primary">key</span>
+</div>
+<div>
+<p class="text-body-md font-semibold text-on-surface">Ricardo Luna changed permissions for Carlos Mendez</p>
+<p class="text-body-sm text-secondary/60">02 Oct 2023 • 14:32 PM • Workshop Module</p>
+</div>
+</div>
+<div class="flex items-start gap-md pb-md border-b border-white/5">
+<div class="w-8 h-8 rounded-full bg-error-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-error">warning</span>
+</div>
+<div>
+<p class="text-body-md font-semibold text-on-surface">Failed login attempt - User TS-4412</p>
+<p class="text-body-sm text-secondary/60">02 Oct 2023 • 13:10 PM • IP: 192.168.1.104</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Role Distribution -->
+<div class="col-span-4 glass-panel rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md text-center">Role Density</h3>
+<div class="flex flex-col gap-md">
+<div class="space-y-xs">
+<div class="flex justify-between text-label-sm text-secondary/60 uppercase">
+<span>Técnico</span>
+<span>65%</span>
+</div>
+<div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="w-[65%] h-full bg-primary-container"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between text-label-sm text-secondary/60 uppercase">
+<span>Recepción</span>
+<span>25%</span>
+</div>
+<div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="w-[25%] h-full bg-tertiary-container"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between text-label-sm text-secondary/60 uppercase">
+<span>Admin</span>
+<span>10%</span>
+</div>
+<div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="w-[10%] h-full bg-primary-fixed"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Interactive row effects
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', function() {
+                this.classList.toggle('bg-white/[0.05]');
+            });
+        });
+
+        // Search bar micro-interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.classList.add('w-80');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.classList.remove('w-80');
+        });
+    </script>
+</body></html>

@@ -1,0 +1,173 @@
+<div class="cobrar-container">
+
+  <!-- Back Button -->
+  <button class="btn-back" (click)="navigateBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Volver a la orden
+  </button>
+
+  <!-- Skeleton Loading -->
+  <div class="skeleton-card" *ngIf="isLoading">
+    <div class="skeleton-line" style="width: 40%; height: 28px;"></div>
+    <div class="skeleton-line" style="width: 60%; height: 18px; margin-top: 8px;"></div>
+    <div class="skeleton-line" style="width: 100%; height: 100px; margin-top: 24px;"></div>
+  </div>
+
+  <ng-container *ngIf="!isLoading && orden">
+
+    <!-- Orden Info Card -->
+    <div class="orden-info-card">
+      <div class="orden-info-header">
+        <div class="orden-id">{{ padOrderId(orden.id) }}</div>
+        <span class="estado-chip estado-listo">LISTO</span>
+      </div>
+      <h2 class="orden-cliente">{{ orden.clienteNombre }}</h2>
+      <p class="orden-falla">{{ orden.fallaReportada }}</p>
+      <div class="presupuesto-row">
+        <span class="presupuesto-label">Presupuesto total</span>
+        <span class="presupuesto-valor">{{ formatCurrency(orden.presupuesto) }}</span>
+      </div>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="form-card">
+      <h3 class="form-title">
+        <mat-icon>payments</mat-icon>
+        Registrar Cobro
+      </h3>
+
+      <!-- Medio de pago selector -->
+      <div class="medio-selector">
+        <p class="selector-label">Seleccioná el medio de pago</p>
+        <div class="medio-grid">
+          <button
+            class="medio-btn"
+            [class.selected]="medioPago === 'EFECTIVO'"
+            (click)="seleccionarMedio('EFECTIVO')"
+            type="button">
+            <mat-icon>payments</mat-icon>
+            <span>Efectivo</span>
+          </button>
+          <button
+            class="medio-btn"
+            [class.selected]="medioPago === 'TARJETA'"
+            (click)="seleccionarMedio('TARJETA')"
+            type="button">
+            <mat-icon>credit_card</mat-icon>
+            <span>Tarjeta</span>
+          </button>
+          <button
+            class="medio-btn"
+            [class.selected]="medioPago === 'MERCADOPAGO'"
+            (click)="seleccionarMedio('MERCADOPAGO')"
+            type="button">
+            <mat-icon>qr_code</mat-icon>
+            <span>MercadoPago</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel EFECTIVO -->
+      <div class="payment-panel" *ngIf="medioPago === 'EFECTIVO'">
+        <div class="monto-fijo-row">
+          <span class="monto-fijo-label">Monto a cobrar</span>
+          <span class="monto-fijo-valor">{{ formatCurrency(orden.presupuesto) }}</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monto recibido</label>
+          <div class="input-wrapper">
+            <span class="input-prefix">$</span>
+            <input
+              type="number"
+              class="form-input"
+              [class.input-error]="montoInsuficiente"
+              [(ngModel)]="montoRecibido"
+              placeholder="0.00"
+              min="0"
+              step="0.01">
+          </div>
+          <p class="input-hint error-hint" *ngIf="montoInsuficiente">
+            El monto recibido es menor al presupuesto
+          </p>
+        </div>
+        <div class="vuelto-card" *ngIf="montoRecibido && !montoInsuficiente">
+          <span class="vuelto-label">Vuelto</span>
+          <span class="vuelto-valor">{{ formatCurrency(vuelto) }}</span>
+        </div>
+      </div>
+
+      <!-- Panel TARJETA -->
+      <div class="payment-panel" *ngIf="medioPago === 'TARJETA'">
+        <div class="monto-fijo-row">
+          <span class="monto-fijo-label">Monto a cobrar</span>
+          <span class="monto-fijo-valor">{{ formatCurrency(orden.presupuesto) }}</span>
+        </div>
+        <div class="info-banner">
+          <mat-icon>info</mat-icon>
+          <span>Confirmá que el posnet aprobó el pago antes de continuar.</span>
+        </div>
+      </div>
+
+      <!-- Panel MERCADOPAGO -->
+      <div class="payment-panel" *ngIf="medioPago === 'MERCADOPAGO'">
+        <div class="monto-fijo-row">
+          <span class="monto-fijo-label">Monto a cobrar</span>
+          <span class="monto-fijo-valor">{{ formatCurrency(orden.presupuesto) }}</span>
+        </div>
+        <div class="info-banner">
+          <mat-icon>qr_code_2</mat-icon>
+          <span>Se generará un link de pago. La orden quedará en espera hasta que MercadoPago confirme el cobro.</span>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button
+        class="btn-submit"
+        (click)="onSubmit()"
+        [disabled]="isSubmitting || (medioPago === 'EFECTIVO' && !montoRecibido) || montoInsuficiente"
+        type="button">
+        <mat-icon *ngIf="!isSubmitting">check_circle</mat-icon>
+        <mat-icon *ngIf="isSubmitting" class="spinning">autorenew</mat-icon>
+        {{ isSubmitting ? 'Procesando...' : getLabelSubmit() }}
+      </button>
+    </div>
+
+  </ng-container>
+</div>
+
+<!-- Modal MercadoPago -->
+<div class="modal-overlay" *ngIf="showMpModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <mat-icon class="modal-icon-mp">qr_code_2</mat-icon>
+      <h2 class="modal-title">Cobro con QR</h2>
+    </div>
+
+    <div class="modal-body modal-body--qr">
+      <div class="qr-container">
+        <img class="qr-image" [src]="mpQrImageUrl" alt="QR de pago" />
+      </div>
+      <p class="qr-wallets-text">Escaneá con Mercado Pago, Modo, Ualá u otra billetera virtual</p>
+
+      <!-- Estado de espera / aprobado -->
+      <div class="payment-status" [class.payment-status--approved]="pagoAprobado">
+        <ng-container *ngIf="!pagoAprobado">
+          <span class="pulse-dot"></span>
+          <span class="status-text">Esperando pago...</span>
+        </ng-container>
+        <ng-container *ngIf="pagoAprobado">
+          <mat-icon class="status-icon-ok">check_circle</mat-icon>
+          <span class="status-text">¡Pago aprobado!</span>
+        </ng-container>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary" (click)="cerrarMpModal()" type="button">
+        <mat-icon>arrow_back</mat-icon>
+        Volver a la orden
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,144 @@
+<div class="perfil-page" *ngIf="!loading">
+  <div class="card">
+
+    <!-- ── Foto de perfil ── -->
+    <div class="card-section">
+      <h3 class="section-title">Foto de perfil</h3>
+      <p class="section-subtitle">Subí una foto para personalizar tu perfil</p>
+
+      <div class="avatar-row">
+        <div class="avatar-preview" [style.background]="avatarImage ? 'transparent' : avatarStyle">
+          <img *ngIf="avatarImage" [src]="avatarImage" class="avatar-photo" alt="foto de perfil">
+          <span *ngIf="!avatarImage">{{ initials }}</span>
+        </div>
+        <div class="avatar-actions">
+          <p class="avatar-hint">JPG, PNG o WebP · Máx. 5 MB · Se recorta en círculo</p>
+          <div class="avatar-btns">
+            <label class="upload-btn" for="photoUpload">
+              <span class="material-symbols-outlined">upload</span>
+              Subir foto
+            </label>
+            <input id="photoUpload" type="file" accept="image/*" (change)="onFileSelected($event)" style="display:none">
+            <button *ngIf="avatarImage" class="btn btn-ghost btn-sm" type="button" (click)="removePhoto()">
+              <span class="material-symbols-outlined">delete</span>
+              Quitar foto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <!-- ── Datos personales ── -->
+    <div class="card-section">
+      <h3 class="section-title">Datos personales</h3>
+      <p class="section-subtitle">Tu información visible en el sistema</p>
+
+      <div class="form-grid-2">
+        <div class="field">
+          <label class="field-label">Nombre completo</label>
+          <input class="field-input" type="text" [(ngModel)]="formNombre" placeholder="Ej: Juan Pérez" autocomplete="name">
+        </div>
+        <div class="field">
+          <label class="field-label">Correo electrónico</label>
+          <input class="field-input" type="email" [(ngModel)]="formEmail" placeholder="correo@ejemplo.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label class="field-label">Teléfono</label>
+          <input class="field-input" type="tel" [(ngModel)]="formTelefono" placeholder="+54 351 000-0000" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label class="field-label">Rol en el sistema</label>
+          <input class="field-input" type="text" [value]="getRolLabel(usuario?.rol || '')" disabled>
+          <span class="field-hint">Solo puede ser modificado por otro administrador</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" type="button"
+          (click)="formNombre = usuario?.nombre || ''; formEmail = usuario?.email || ''; formTelefono = usuario?.telefono || ''">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" type="button" [disabled]="saving" (click)="saveDatos()">
+          <span class="material-symbols-outlined">check</span>
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="section-sep"></div>
+
+    <!-- ── Seguridad ── -->
+    <div class="card-section">
+      <h3 class="section-title">Cambiar contraseña</h3>
+      <p class="section-subtitle">Usá una contraseña larga y única</p>
+
+      <div class="form-grid-1">
+        <div class="field">
+          <label class="field-label">Contraseña actual</label>
+          <div class="field-wrap">
+            <input class="field-input" [type]="showCurrentPw ? 'text' : 'password'"
+              [(ngModel)]="currentPassword" placeholder="••••••••••••"
+              autocomplete="current-password">
+            <button class="pw-eye" type="button" (click)="showCurrentPw = !showCurrentPw" tabindex="-1">
+              <span class="material-symbols-outlined">{{ showCurrentPw ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Nueva contraseña</label>
+          <div class="field-wrap">
+            <input class="field-input" [type]="showNewPw ? 'text' : 'password'"
+              [ngModel]="newPassword" (ngModelChange)="checkPasswordStrength($event)"
+              placeholder="••••••••••••" autocomplete="new-password">
+            <button class="pw-eye" type="button" (click)="showNewPw = !showNewPw" tabindex="-1">
+              <span class="material-symbols-outlined">{{ showNewPw ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <div class="pw-strength">
+            <p class="pw-label" [style.color]="pwLabelColor">{{ pwLabel }}</p>
+            <div class="pw-bars">
+              <div class="pw-bar" [class.filled]="barFilled(0)" [ngClass]="barFilled(0) ? pwStrengthLevel : ''"></div>
+              <div class="pw-bar" [class.filled]="barFilled(1)" [ngClass]="barFilled(1) ? pwStrengthLevel : ''"></div>
+              <div class="pw-bar" [class.filled]="barFilled(2)" [ngClass]="barFilled(2) ? pwStrengthLevel : ''"></div>
+              <div class="pw-bar" [class.filled]="barFilled(3)" [ngClass]="barFilled(3) ? pwStrengthLevel : ''"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Confirmar nueva contraseña</label>
+          <div class="field-wrap">
+            <input class="field-input" [type]="showConfirmPw ? 'text' : 'password'"
+              [(ngModel)]="confirmPassword" placeholder="••••••••••••"
+              autocomplete="new-password"
+              [class.field-error]="confirmPassword && newPassword !== confirmPassword">
+            <button class="pw-eye" type="button" (click)="showConfirmPw = !showConfirmPw" tabindex="-1">
+              <span class="material-symbols-outlined">{{ showConfirmPw ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <span class="field-hint field-hint-error" *ngIf="confirmPassword && newPassword !== confirmPassword">
+            Las contraseñas no coinciden
+          </span>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top: 20px">
+        <button class="btn btn-ghost" type="button"
+          (click)="currentPassword=''; newPassword=''; confirmPassword=''; pwStrength=0; pwLabelColor=''">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" type="button" [disabled]="saving" (click)="changePassword()">
+          <span class="material-symbols-outlined">lock</span>
+          Actualizar contraseña
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Skeleton loader -->
+<div class="perfil-loading" *ngIf="loading">
+  <div class="skeleton-card"></div>
+</div>

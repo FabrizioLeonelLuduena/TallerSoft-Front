@@ -1,0 +1,122 @@
+<ng-container *ngIf="!isAsistenteRoute">
+
+  <!-- PANEL DEL CHAT -->
+  <div class="chat-panel" [class.chat-panel--abierto]="abierto" role="dialog" aria-label="Asistente IA">
+
+    <!-- Header del panel -->
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <div class="panel-avatar">
+          <mat-icon>smart_toy</mat-icon>
+          <span class="panel-status-dot"></span>
+        </div>
+        <div>
+          <p class="panel-nombre">Asistente IA</p>
+          <span class="panel-status">
+            <span class="status-dot"></span>
+            En línea
+          </span>
+        </div>
+      </div>
+      <div class="panel-header-actions">
+        <button class="panel-btn-expand" (click)="irAlAsistente()" title="Abrir pantalla completa">
+          <mat-icon>open_in_full</mat-icon>
+        </button>
+        <button class="panel-btn-close" (click)="cerrar()" title="Cerrar">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="panel-mensajes" #mensajesRef>
+
+      <!-- Sugerencias (solo inicial) -->
+      <div class="panel-sugerencias" *ngIf="mensajes.length === 1 && !cargando">
+        <button
+          class="panel-sugerencia"
+          *ngFor="let s of sugerencias"
+          (click)="usarSugerencia(s)"
+          [disabled]="cargando">
+          <mat-icon>lightbulb_outline</mat-icon>
+          {{ s }}
+        </button>
+      </div>
+
+      <!-- Lista de mensajes -->
+      <ng-container *ngFor="let m of mensajes">
+        <div
+          class="panel-msg"
+          [class.panel-msg--asistente]="m.rol === 'asistente'"
+          [class.panel-msg--usuario]="m.rol === 'usuario'"
+          *ngIf="!(mensajes.length === 1 && m.rol === 'asistente')">
+
+          <div class="panel-msg-avatar" *ngIf="m.rol === 'asistente'">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+
+          <div class="panel-bubble" [class.bubble--asistente]="m.rol === 'asistente'" [class.bubble--usuario]="m.rol === 'usuario'">
+            <p class="panel-bubble-texto">{{ m.texto }}</p>
+            <span class="panel-bubble-time">{{ m.timestamp | date:'HH:mm' }}</span>
+          </div>
+
+          <div class="panel-msg-avatar panel-msg-avatar--user" *ngIf="m.rol === 'usuario'">
+            <mat-icon>person</mat-icon>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Typing -->
+      <div class="panel-msg panel-msg--asistente" *ngIf="cargando">
+        <div class="panel-msg-avatar">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        <div class="panel-bubble bubble--asistente">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input -->
+    <div class="panel-input" [class.panel-input--focus]="inputFocused">
+      <textarea
+        #inputRef
+        class="panel-textarea"
+        [(ngModel)]="pregunta"
+        (keydown)="onKeydown($event)"
+        (focus)="inputFocused = true"
+        (blur)="inputFocused = false"
+        [disabled]="cargando"
+        placeholder="Escribí tu pregunta..."
+        rows="1"
+        maxlength="500">
+      </textarea>
+      <button
+        class="panel-btn-enviar"
+        (click)="enviar()"
+        [disabled]="!pregunta.trim() || cargando"
+        [class.panel-btn-enviar--active]="pregunta.trim() && !cargando"
+        title="Enviar">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- FAB BUTTON -->
+  <button
+    class="chat-fab"
+    [class.chat-fab--abierto]="abierto"
+    (click)="toggleChat()"
+    [title]="abierto ? 'Cerrar asistente' : 'Abrir asistente IA'">
+    <mat-icon class="fab-icon fab-icon--open">smart_toy</mat-icon>
+    <mat-icon class="fab-icon fab-icon--close">keyboard_arrow_down</mat-icon>
+    <span class="fab-badge" *ngIf="mensajesNoLeidos > 0 && !abierto">
+      {{ mensajesNoLeidos > 9 ? '9+' : mensajesNoLeidos }}
+    </span>
+  </button>
+
+</ng-container>

@@ -1,0 +1,343 @@
+.create-container {
+  width: 100%;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    padding: 24px 20px;
+    gap: 16px;
+  }
+}
+
+// ── Form layout ──────────────────────────────────────────────────────────────
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  .section-title {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 245, 212, 0.12);
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+
+  .form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+// ── Fields ───────────────────────────────────────────────────────────────────
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required { color: #ff6b6b; }
+
+.ts-input {
+  padding: 11px var(--spacing-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  color: var(--color-on-surface);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: all 0.2s ease;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder { color: rgba(222, 225, 247, 0.35); }
+
+  &:focus {
+    border-color: rgba(0, 245, 212, 0.35);
+    background: rgba(0, 245, 212, 0.04);
+    box-shadow: 0 0 0 2px rgba(0, 245, 212, 0.08);
+  }
+
+  &.error {
+    border-color: #ff6b6b;
+    &:focus { box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.08); }
+  }
+}
+
+.error-text {
+  font-size: var(--font-size-sm);
+  color: #ff6b6b;
+  margin-top: -4px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+// ── Password ─────────────────────────────────────────────────────────────────
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .ts-input { padding-right: 44px; }
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--spacing-md);
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  transition: color 200ms ease;
+
+  .material-symbols-outlined { font-size: 18px; /* icon size — intentional */}
+  &:hover { color: var(--color-accent); }
+}
+
+.password-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: color 200ms ease;
+  &.error { color: #ff6b6b; }
+}
+
+// ── Info card ────────────────────────────────────────────────────────────────
+
+.info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px var(--spacing-md);
+  background: rgba(0, 245, 212, 0.04);
+  border: 1px solid rgba(0, 245, 212, 0.1);
+  border-radius: var(--radius-md);
+
+  .info-icon {
+    font-size: 18px; /* icon size — intentional */
+    color: var(--color-accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--color-secondary);
+    line-height: var(--line-height-relaxed);
+  }
+}
+
+// ── Role cards ───────────────────────────────────────────────────────────────
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.role-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(222, 225, 247, 0.08);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    border-color: rgba(0, 245, 212, 0.2);
+    background: rgba(0, 245, 212, 0.03);
+  }
+
+  &.role-card-selected {
+    background: rgba(0, 245, 212, 0.07);
+    border-color: rgba(0, 245, 212, 0.35);
+    box-shadow: 0 0 24px rgba(0, 245, 212, 0.1);
+
+    .role-icon {
+      background: rgba(0, 245, 212, 0.15);
+      color: var(--color-accent);
+    }
+
+    .role-name { color: var(--color-accent); }
+  }
+}
+
+.role-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-secondary);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  .material-symbols-outlined { font-size: 20px; /* icon size — intentional */}
+}
+
+.role-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-name {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+  transition: color 0.2s ease;
+}
+
+.role-desc {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.role-check {
+  font-size: 18px; /* icon size — intentional */
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────────
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: 24px;
+
+  button {
+    flex: 1;
+    padding: 12px 24px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    transition: all 150ms ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+
+    &:hover:not(:disabled) {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .ts-btn-primary {
+    background: #00f5d4;
+    color: #0a0f1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 0 20px rgba(0, 245, 212, 0.25);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 0 30px rgba(0, 245, 212, 0.35);
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      box-shadow: none;
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .loading-icon {
+        font-size: 18px; /* icon size — intentional */
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

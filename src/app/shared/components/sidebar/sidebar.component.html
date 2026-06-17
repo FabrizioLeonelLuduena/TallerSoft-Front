@@ -1,0 +1,27 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <span>TallerSoft</span>
+  <span class="spacer"></span>
+  <span class="user-info" *ngIf="currentUser">
+    {{ currentUser.email }} ({{ currentUser.rol }})
+  </span>
+  <button mat-icon-button (click)="logout()" matTooltip="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-drawer-container class="drawer-container">
+  <mat-drawer class="sidebar" mode="side" opened>
+    <mat-nav-list>
+      <mat-list-item *ngFor="let item of menuItems"
+                      [routerLink]="item.route"
+                      routerLinkActive="active">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-drawer>
+
+  <mat-drawer-content class="main-content">
+    <ng-content></ng-content>
+  </mat-drawer-content>
+</mat-drawer-container>

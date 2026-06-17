@@ -1,0 +1,576 @@
+<div class="ds-wrap">
+
+  <!-- ═══ LOADING ══════════════════════════════════════════════════════════ -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Cargando datos del taller...</p>
+  </div>
+
+  <!-- ═══ ERROR ════════════════════════════════════════════════════════════ -->
+  <div *ngIf="error && !loading" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>No se pudo conectar con el servicio de analítica.</span>
+    <button class="retry-btn" (click)="reintentar()">Reintentar</button>
+  </div>
+
+  <!-- ═══ CONTENIDO PRINCIPAL ══════════════════════════════════════════════ -->
+  <ng-container *ngIf="!loading && !error">
+
+    <!-- Barra de alertas -->
+    <div class="alert-bar" *ngIf="alertasDanger.length || alertasWarn.length">
+      <div class="alert-chip danger" *ngIf="alertasDanger.length" (click)="abrirModal('danger')">
+        <mat-icon>error</mat-icon>
+        Alertas críticas <span class="chip-badge">{{ alertasDanger.length }}</span>
+      </div>
+      <div class="alert-chip warn" *ngIf="alertasWarn.length" (click)="abrirModal('warn')">
+        <mat-icon>warning</mat-icon>
+        Advertencias <span class="chip-badge">{{ alertasWarn.length }}</span>
+      </div>
+    </div>
+
+    <!-- Modal de alertas -->
+    <div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
+      <div class="modal-panel" [class.modal-danger]="modalTipo === 'danger'" [class.modal-warn]="modalTipo === 'warn'" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <div class="modal-title">
+            <mat-icon>{{ modalTipo === 'danger' ? 'error' : 'warning' }}</mat-icon>
+            {{ modalTipo === 'danger' ? 'Alertas críticas' : 'Advertencias' }}
+            <span class="chip-badge">{{ modalAlertas.length }}</span>
+          </div>
+          <button class="modal-close" (click)="cerrarModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-alerta-item" *ngFor="let a of modalAlertas"
+               [class.clickable]="moduloRutas[a.modulo]"
+               (click)="navegarDesdeAlerta(a)">
+            <div class="modal-alerta-icon" [class.icon-danger]="a.tipo === 'danger'" [class.icon-warn]="a.tipo === 'warn'">
+              <mat-icon>{{ a.tipo === 'danger' ? 'error' : 'warning' }}</mat-icon>
+            </div>
+            <div class="modal-alerta-txt">
+              <div class="modal-alerta-titulo">{{ a.titulo }}</div>
+              <div class="modal-alerta-desc">{{ a.descripcion }}</div>
+            </div>
+            <mat-icon class="nav-arrow" *ngIf="moduloRutas[a.modulo]">chevron_right</mat-icon>
+          </div>
+          <div class="no-data" *ngIf="modalAlertas.length === 0">
+            <mat-icon>check_circle</mat-icon>
+            <span>Sin alertas activas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-header">
+      <div class="tabs-row">
+        <button class="tab-btn" [class.active]="tabActiva === 'operativo'"  (click)="setTab('operativo')">Operativo</button>
+        <button class="tab-btn" [class.active]="tabActiva === 'financiero'" (click)="setTab('financiero')">Financiero</button>
+        <button class="tab-btn" [class.active]="tabActiva === 'clientes'"   (click)="setTab('clientes')">Clientes</button>
+        <button class="tab-btn" [class.active]="tabActiva === 'stock'"      (click)="setTab('stock')">Stock</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB OPERATIVO
+    ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="tabActiva === 'operativo'" class="tab-content">
+
+      <div class="sec-label">Estado general</div>
+      <div class="g6">
+        <!-- Pendientes -->
+        <div class="kpi teal">
+          <div class="kpi-icon-box teal">
+            <mat-icon>assignment</mat-icon>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Pendientes</div>
+            <div class="kpi-val">{{ resumenOrdenes?.pendientes ?? 0 }}</div>
+          </div>
+        </div>
+        <!-- En Proceso -->
+        <div class="kpi orange">
+          <div class="kpi-icon-box orange">
+            <mat-icon>build</mat-icon>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">En Proceso</div>
+            <div class="kpi-val">{{ resumenOrdenes?.en_proceso ?? 0 }}</div>
+          </div>
+        </div>
+        <!-- Listas -->
+        <div class="kpi green">
+          <div class="kpi-icon-box green">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Listas p/ Entregar</div>
+            <div class="kpi-val">{{ resumenOrdenes?.listas ?? 0 }}</div>
+          </div>
+        </div>
+        <!-- Entregadas -->
+        <div class="kpi blue">
+          <div class="kpi-icon-box blue">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Entregadas</div>
+            <div class="kpi-val">{{ resumenOrdenes?.entregadas ?? 0 }}</div>
+          </div>
+        </div>
+        <!-- Alta Prioridad -->
+        <div class="kpi danger" [class.kpi-alert]="ordenesAltaPrioridad.length > 0">
+          <div class="kpi-icon-box danger">
+            <mat-icon>priority_high</mat-icon>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Alta Prioridad</div>
+            <div class="kpi-val" [style.color]="ordenesAltaPrioridad.length ? 'var(--ds-danger)' : 'inherit'">
+              {{ ordenesAltaPrioridad.length }}
+            </div>
+            <div class="kpi-sub">sin avanzar</div>
+          </div>
+        </div>
+        <!-- Sin Movimiento -->
+        <div class="kpi warn">
+          <div class="kpi-icon-box warn">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Sin Movimiento</div>
+            <div class="kpi-val" [style.color]="ordenesSinMovimiento.length ? 'var(--ds-warn)' : 'inherit'">
+              {{ ordenesSinMovimiento.length }}
+            </div>
+            <div class="kpi-sub">≥ 5 días</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Embudo + tabla sin movimiento -->
+      <div class="g21">
+        <!-- Embudo de reparación -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Embudo de Reparación</span>
+            <span class="card-tag">tiempo prom. por estado</span>
+          </div>
+          <div class="card-body">
+            <p class="card-hint">Días promedio que una orden permanece en cada estado</p>
+            <div *ngIf="embudo.length === 0" class="no-data">
+              <mat-icon>hourglass_empty</mat-icon>
+              <span>Sin datos suficientes</span>
+            </div>
+            <div class="funnel" *ngIf="embudo.length > 0">
+              <div class="f-row" *ngFor="let e of embudo; let i = index">
+                <span class="f-lbl"
+                      [class.f-lbl-bold]="e.estado === 'ENTREGADO'">
+                  {{ estadoLabel(e.estado) }}
+                </span>
+                <div class="f-track">
+                  <div class="f-bar" [ngClass]="embudo_color_class(i)"
+                       [style.width.%]="e.pct">
+                    {{ e.promedio_dias }}d
+                  </div>
+                </div>
+                <span class="f-days"
+                      [style.color]="e.estado === 'ENTREGADO' ? 'var(--ds-green)' : null">
+                  {{ e.promedio_dias }}d
+                </span>
+              </div>
+            </div>
+            <!-- Insight: estado con más tiempo -->
+            <div class="funnel-insight" *ngIf="embudo.length > 1">
+              <mat-icon>info</mat-icon>
+              <span>
+                <strong>En proceso</strong> concentra el mayor tiempo de reparación.
+                Tiempo total estimado:
+                <strong style="color: var(--ds-orange)">{{ tiempoTotalDias | number:'1.1-1' }}d</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sin movimiento -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Sin Movimiento</span>
+            <a routerLink="/ordenes" class="card-link">Ver todas →</a>
+          </div>
+          <div class="card-body card-body-flush" style="padding-top: 8px">
+            <div *ngIf="ordenesSinMovimiento.length === 0" class="no-data">
+              <mat-icon>check_circle</mat-icon>
+              <span>Ninguna orden estancada</span>
+            </div>
+            <table class="tbl" *ngIf="ordenesSinMovimiento.length > 0">
+              <thead>
+                <tr>
+                  <th>Orden</th>
+                  <th>Estado</th>
+                  <th>Días</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let o of ordenesSinMovimiento | slice:0:5">
+                  <td>
+                    <div class="tbl-main">#{{ o.id }}</div>
+                    <div class="tbl-sub">{{ o.equipo_tipo }}</div>
+                  </td>
+                  <td>
+                    <span class="badge-estado" [ngClass]="estadoClass(o.estado)">
+                      {{ o.estado | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="o.dias_estancada >= 7 ? 'pill-danger' : 'pill-warn'">
+                      {{ o.dias_estancada }}d
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alta prioridad -->
+      <div class="sec-label">Alta prioridad — sin avanzar</div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Órdenes ALTA prioridad sin avanzar</span>
+          <a routerLink="/ordenes" class="card-link">Ir a órdenes →</a>
+        </div>
+        <div class="card-body card-body-flush" style="padding-top: 8px">
+          <div *ngIf="ordenesAltaPrioridad.length === 0" class="no-data no-data-ok">
+            <mat-icon>check_circle</mat-icon>
+            <span>Sin órdenes de alta prioridad bloqueadas</span>
+          </div>
+          <table class="tbl" *ngIf="ordenesAltaPrioridad.length > 0">
+            <thead>
+              <tr>
+                <th>Orden</th>
+                <th>Cliente</th>
+                <th>Equipo</th>
+                <th>Técnico</th>
+                <th>Estado</th>
+                <th>Días</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let o of ordenesAltaPrioridad">
+                <td><strong>#{{ o.id }}</strong></td>
+                <td>{{ o.cliente_nombre }}</td>
+                <td class="tbl-muted">{{ o.equipo_marca }} {{ o.equipo_tipo }}</td>
+                <td class="tbl-muted">{{ o.tecnico_nombre || '—' }}</td>
+                <td>
+                  <span class="badge-estado" [ngClass]="estadoClass(o.estado)">
+                    {{ o.estado | titlecase }}
+                  </span>
+                </td>
+                <td>
+                  <span [class]="o.dias_sin_avanzar >= 3 ? 'pill-danger' : 'pill-warn'">
+                    {{ o.dias_sin_avanzar }}d
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /tab operativo -->
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB FINANCIERO
+    ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="tabActiva === 'financiero'" class="tab-content">
+
+      <div class="sec-label">Caja de hoy</div>
+      <div class="g4">
+        <!-- Ingresos del día -->
+        <div class="kpi green">
+          <div class="kpi-icon-box green"><mat-icon>attach_money</mat-icon></div>
+          <div class="kpi-body">
+            <div class="kpi-label">Ingresos del día</div>
+            <div class="kpi-val kpi-val-lg" style="color: var(--ds-green)">
+              ${{ (cajaDiaria?.total_ingresos ?? 0) | number:'1.0-0' }}
+            </div>
+            <div class="kpi-sub">{{ cajaDiaria?.cantidad_cobros ?? 0 }} cobros aprobados</div>
+          </div>
+        </div>
+        <!-- Ticket promedio -->
+        <div class="kpi warn">
+          <div class="kpi-icon-box warn"><mat-icon>trending_up</mat-icon></div>
+          <div class="kpi-body">
+            <div class="kpi-label">Ticket promedio</div>
+            <div class="kpi-val kpi-val-lg">${{ ticketPromedio | number:'1.0-0' }}</div>
+          </div>
+        </div>
+        <!-- Rechazados hoy -->
+        <div class="kpi danger">
+          <div class="kpi-icon-box danger"><mat-icon>cancel</mat-icon></div>
+          <div class="kpi-body">
+            <div class="kpi-label">Rechazados hoy</div>
+            <div class="kpi-val kpi-val-lg" style="color: var(--ds-danger)">
+              ${{ (rechazos?.total_rechazado ?? 0) | number:'1.0-0' }}
+            </div>
+            <div class="kpi-sub">{{ rechazos?.cantidad_rechazos ?? 0 }} pagos rechazados</div>
+          </div>
+        </div>
+        <!-- Conversión ppto -->
+        <div class="kpi blue">
+          <div class="kpi-icon-box blue"><mat-icon>show_chart</mat-icon></div>
+          <div class="kpi-body">
+            <div class="kpi-label">Conversión ppto.</div>
+            <div class="kpi-val kpi-val-lg" style="color: var(--ds-blue)">
+              {{ conversionPresupuesto?.tasa_conversion_pct ?? 0 }}%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <!-- Conversión presupuesto → cobro -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Conversión presupuesto → cobro</span>
+            <span class="card-tag">este mes</span>
+          </div>
+          <div class="card-body">
+            <div class="conv-row">
+              <div class="conv-step">
+                <div class="conv-val" style="color: var(--ds-blue)">
+                  {{ conversionPresupuesto?.total_con_presupuesto ?? 0 }}
+                </div>
+                <div class="conv-lbl">Con presupuesto</div>
+              </div>
+              <div class="conv-arr">→</div>
+              <div class="conv-step">
+                <div class="conv-val" style="color: var(--ds-green)">
+                  {{ conversionPresupuesto?.total_cobradas ?? 0 }}
+                </div>
+                <div class="conv-lbl">Cobradas</div>
+              </div>
+              <div class="conv-arr">→</div>
+              <div class="conv-step">
+                <div class="conv-val" style="color: var(--ds-danger)">
+                  {{ conversionPresupuesto?.total_no_cobradas ?? 0 }}
+                </div>
+                <div class="conv-lbl">No cobradas</div>
+              </div>
+            </div>
+            <div class="conv-badge">
+              <div class="conv-badge-val">{{ conversionPresupuesto?.tasa_conversion_pct ?? 0 }}%</div>
+              <div class="conv-badge-lbl">tasa de conversión — objetivo: 80%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cobros rechazados -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Cobros rechazados</span>
+            <span class="card-tag">últimos 7 días</span>
+          </div>
+          <div class="card-body">
+            <div *ngIf="!rechazos?.por_medio?.length" class="no-data no-data-ok">
+              <mat-icon>check_circle</mat-icon>
+              <span>Sin cobros rechazados esta semana</span>
+            </div>
+            <ng-container *ngIf="rechazos?.por_medio?.length">
+              <div class="rej-row" *ngFor="let m of rechazos.por_medio">
+                <div>
+                  <div class="rej-medio">{{ m.medio_pago }}</div>
+                  <div class="rej-qty">{{ m.cantidad_rechazos }} rechazo(s)</div>
+                </div>
+                <div class="rej-amt">−${{ m.monto_total_rechazado | number:'1.0-0' }}</div>
+              </div>
+              <div class="rej-row rej-total">
+                <div class="rej-total-lbl">Total perdido esta semana</div>
+                <div class="rej-total-val">${{ rechazos.total_rechazado | number:'1.0-0' }}</div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolución mensual -->
+      <div class="sec-label">Evolución de ingresos</div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Ingresos últimos 6 meses</span>
+          <span class="card-tag">mensual</span>
+        </div>
+        <div class="card-body">
+          <div *ngIf="evolucionBarras.length === 0" class="no-data">
+            <mat-icon>bar_chart</mat-icon>
+            <span>Sin datos de ingresos</span>
+          </div>
+          <div class="bar-chart" *ngIf="evolucionBarras.length > 0">
+            <div class="bar-col" *ngFor="let b of evolucionBarras">
+              <span class="bar-label-top">{{ b.label }}</span>
+              <div class="bar-track">
+                <div class="bar-fill" [style.height.%]="b.pct"></div>
+              </div>
+              <span class="bar-mes">{{ b.mes }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab financiero -->
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB CLIENTES
+    ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="tabActiva === 'clientes'" class="tab-content">
+
+      <div class="sec-label">Retención de clientes</div>
+      <div class="g2">
+        <!-- Mes actual -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Clientes recurrentes vs nuevos</span>
+            <span class="card-tag">mes actual</span>
+          </div>
+          <div class="card-body">
+            <div *ngIf="!recurrenciaActual" class="no-data">
+              <mat-icon>people_outline</mat-icon>
+              <span>Sin datos este mes</span>
+            </div>
+            <ng-container *ngIf="recurrenciaActual">
+              <div class="rec-big">
+                <div class="rec-pct">{{ recurrenciaActual.porcentaje_recurrentes }}%</div>
+                <div class="rec-lbl">de las órdenes son de clientes que ya vinieron antes</div>
+              </div>
+              <div class="rec-split">
+                <div class="rec-box">
+                  <div class="rec-box-val" style="color: var(--ds-green)">
+                    {{ recurrenciaActual.clientes_recurrentes }}
+                  </div>
+                  <div class="rec-box-lbl">Recurrentes</div>
+                </div>
+                <div class="rec-box">
+                  <div class="rec-box-val" style="color: var(--ds-blue)">
+                    {{ recurrenciaActual.clientes_nuevos }}
+                  </div>
+                  <div class="rec-box-lbl">Nuevos</div>
+                </div>
+                <div class="rec-box">
+                  <div class="rec-box-val">{{ recurrenciaActual.total_ordenes }}</div>
+                  <div class="rec-box-lbl">Total</div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Histórico -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Recurrencia histórica</span>
+            <span class="card-tag">últimos 6 meses</span>
+          </div>
+          <div class="card-body">
+            <div *ngIf="recurrencia.length === 0" class="no-data">
+              <mat-icon>timeline</mat-icon>
+              <span>Sin datos históricos</span>
+            </div>
+            <div class="prog" *ngFor="let r of recurrencia">
+              <div class="prog-hd">
+                <span class="prog-lbl">{{ r.mes }}</span>
+                <span class="prog-val">{{ r.porcentaje_recurrentes }}%</span>
+              </div>
+              <div class="prog-track">
+                <div class="prog-fill"
+                     [style.width.%]="r.porcentaje_recurrentes"
+                     [style.background]="r.porcentaje_recurrentes >= 60 ? 'var(--ds-green)' : r.porcentaje_recurrentes >= 40 ? 'var(--ds-blue)' : 'var(--ds-warn)'">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab clientes -->
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB STOCK
+    ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="tabActiva === 'stock'" class="tab-content">
+
+      <div class="sec-label">Consumo y alertas</div>
+      <div class="g2">
+        <!-- Top categorías -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Top categorías de repuestos</span>
+            <span class="card-tag">por consumo</span>
+          </div>
+          <div class="card-body">
+            <div *ngIf="stockPorCategoria.length === 0" class="no-data">
+              <mat-icon>inventory_2</mat-icon>
+              <span>Sin datos de consumo</span>
+            </div>
+            <div class="prog" *ngFor="let c of stockPorCategoria | slice:0:6">
+              <div class="prog-hd">
+                <span class="prog-lbl">{{ c.categoria }}</span>
+                <span class="prog-val">{{ c.total_unidades }} uds.</span>
+              </div>
+              <div class="prog-track">
+                <div class="prog-fill"
+                     [style.width.%]="catPct(c.total_unidades)"
+                     [style.background]="'var(--ds-orange)'">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock crítico -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">
+              <mat-icon style="color: var(--ds-danger)">warning</mat-icon>
+              Stock Crítico
+            </span>
+            <a routerLink="/stock" class="card-link">Reponer →</a>
+          </div>
+          <div class="card-body card-body-flush" style="padding-top: 8px">
+            <div *ngIf="stockCritico.length === 0" class="no-data no-data-ok">
+              <mat-icon>check_circle</mat-icon>
+              <span>Todos los repuestos tienen stock suficiente</span>
+            </div>
+            <table class="tbl" *ngIf="stockCritico.length > 0">
+              <thead>
+                <tr>
+                  <th>Repuesto</th>
+                  <th>Actual</th>
+                  <th>Mín.</th>
+                  <th>Déficit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of stockCritico">
+                  <td>
+                    <div class="tbl-main">{{ r.nombre }}</div>
+                    <div class="tbl-sub">{{ r.categoria }}</div>
+                  </td>
+                  <td>
+                    <span class="value-semibold" style="color: var(--ds-danger)">{{ r.stock_actual }}</span>
+                  </td>
+                  <td>
+                    <span class="tbl-muted">{{ r.stock_minimo }}</span>
+                  </td>
+                  <td>
+                    <span [class]="r.diferencia <= -3 ? 'pill-danger' : 'pill-warn'">
+                      {{ r.diferencia }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab stock -->
+
+  </ng-container>
+</div>

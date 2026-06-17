@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TallerSoft ERP - Create User</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#0e1322",
+                        "secondary-container": "#3f4b50",
+                        "on-tertiary-fixed": "#001e2e",
+                        "on-error": "#690005",
+                        "on-primary-container": "#006c5c",
+                        "outline": "#83948f",
+                        "surface-container-lowest": "#090e1c",
+                        "surface": "#0e1322",
+                        "surface-container-highest": "#2f3445",
+                        "surface-tint": "#00dfc1",
+                        "surface-container": "#1a1f2f",
+                        "on-background": "#dee1f7",
+                        "outline-variant": "#3a4a46",
+                        "on-tertiary-container": "#466277",
+                        "error": "#ffb4ab",
+                        "surface-container-low": "#161b2b",
+                        "on-primary": "#00382f",
+                        "secondary": "#bcc8ce",
+                        "surface-variant": "#2f3445",
+                        "primary-fixed-dim": "#00dfc1",
+                        "on-primary-fixed-variant": "#005144",
+                        "surface-bright": "#343949",
+                        "background": "#0e1322",
+                        "on-secondary-container": "#aebac0",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#c8e6ff",
+                        "tertiary": "#f1f7ff",
+                        "on-surface-variant": "#b9cac4",
+                        "on-secondary-fixed-variant": "#3d484d",
+                        "tertiary-container": "#c0def6",
+                        "on-tertiary-fixed-variant": "#2d4a5e",
+                        "inverse-primary": "#006b5b",
+                        "secondary-fixed-dim": "#bcc8ce",
+                        "primary-fixed": "#26fedc",
+                        "tertiary-fixed-dim": "#accae2",
+                        "inverse-surface": "#dee1f7",
+                        "on-tertiary": "#143346",
+                        "primary": "#d7fff3",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#121d21",
+                        "on-surface": "#dee1f7",
+                        "on-primary-fixed": "#00201a",
+                        "primary-container": "#00f5d4",
+                        "on-secondary": "#273237",
+                        "surface-container-high": "#25293a",
+                        "secondary-fixed": "#d8e4ea",
+                        "inverse-on-surface": "#2b3040"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "margin": "24px",
+                        "gutter": "16px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-sm": ["10px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                        "body-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .abyss-overlay {
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(8px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus {
+            outline: none;
+            border-color: #00f5d4 !important;
+            box-shadow: 0 0 0 1px rgba(0, 245, 212, 0.2);
+        }
+        .role-card-selected {
+            background: rgba(0, 245, 212, 0.1);
+            border-color: #00f5d4 !important;
+            color: #00f5d4 !important;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md min-h-screen flex items-center justify-center p-margin">
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 abyss-overlay flex items-center justify-center z-50 p-md">
+<!-- MatDialog Style Modal -->
+<div class="glass-panel w-full max-w-[600px] rounded-xl overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-300">
+<!-- Header -->
+<div class="flex justify-between items-center px-lg py-md border-b border-white/10">
+<h2 class="font-headline-md text-headline-md text-on-surface">Create New User</h2>
+<button class="text-secondary hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Content -->
+<div class="p-lg space-y-lg overflow-y-auto max-h-[819px]">
+<!-- Input Group: Full Name -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase tracking-wider">Full Name</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-body-md text-on-surface placeholder:text-secondary/40 transition-all" placeholder="e.g. Alejandro García" type="text"/>
+</div>
+</div>
+<!-- Input Group: Email -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase tracking-wider">Email Address</label>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-body-md text-on-surface placeholder:text-secondary/40 transition-all" placeholder="alejandro@tallersoft.com" type="email"/>
+</div>
+<!-- Input Group: Password -->
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase tracking-wider">Password</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg px-md py-sm text-body-md text-on-surface placeholder:text-secondary/40 transition-all pr-xl" id="password-input" placeholder="••••••••" type="password"/>
+<button class="absolute right-md text-secondary hover:text-primary transition-colors" onclick="togglePassword()">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility" id="password-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Role Selector -->
+<div class="space-y-md">
+<label class="font-label-md text-label-md text-secondary uppercase tracking-wider">Select User Role</label>
+<div class="grid grid-cols-1 gap-sm">
+<!-- Role Card: Admin -->
+<div class="role-card group flex items-start gap-md p-md rounded-xl border border-white/10 bg-white/5 cursor-pointer hover:bg-white/10 transition-all duration-200" onclick="selectRole(this)">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high shrink-0 group-[.role-card-selected]:bg-primary/20">
+<span class="material-symbols-outlined text-[24px]" data-icon="security">security</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm">Admin</p>
+<p class="text-body-sm text-secondary/70 group-[.role-card-selected]:text-primary/70">Full control over system settings.</p>
+</div>
+</div>
+<!-- Role Card: Técnico (Selected) -->
+<div class="role-card role-card-selected group flex items-start gap-md p-md rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-all duration-200" onclick="selectRole(this)">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/20 shrink-0">
+<span class="material-symbols-outlined text-[24px]" data-icon="build">build</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm">Técnico</p>
+<p class="text-body-sm text-primary/70">Access to orders &amp; inventory.</p>
+</div>
+</div>
+<!-- Role Card: Recepción -->
+<div class="role-card group flex items-start gap-md p-md rounded-xl border border-white/10 bg-white/5 cursor-pointer hover:bg-white/10 transition-all duration-200" onclick="selectRole(this)">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high shrink-0 group-[.role-card-selected]:bg-primary/20">
+<span class="material-symbols-outlined text-[24px]" data-icon="support_agent">support_agent</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-sm text-headline-sm">Recepción</p>
+<p class="text-body-sm text-secondary/70 group-[.role-card-selected]:text-primary/70">Manage intake &amp; customer flow.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="px-lg py-md bg-white/5 border-t border-white/10 flex justify-end items-center gap-md">
+<button class="px-lg py-sm font-label-md text-label-md text-secondary hover:text-on-surface transition-colors">
+                    Cancel
+                </button>
+<button class="px-xl py-sm bg-primary-container text-[#0A0F1E] font-label-md text-label-md rounded-lg active:scale-95 transition-all hover:brightness-110 shadow-lg shadow-primary-container/10">
+                    Confirm Creation
+                </button>
+</div>
+</div>
+</div>
+<!-- Background Mock Content (Heads-up display context) -->
+<div class="w-full h-full flex flex-col gap-lg opacity-20 pointer-events-none select-none">
+<div class="h-16 w-full glass-panel rounded-lg"></div>
+<div class="grid grid-cols-12 gap-gutter flex-1">
+<div class="col-span-3 glass-panel rounded-xl"></div>
+<div class="col-span-9 space-y-md">
+<div class="h-40 glass-panel rounded-xl"></div>
+<div class="h-96 glass-panel rounded-xl"></div>
+</div>
+</div>
+</div>
+<script>
+        function togglePassword() {
+            const input = document.getElementById('password-input');
+            const icon = document.getElementById('password-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+        function selectRole(element) {
+            // Remove selection from all
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('role-card-selected');
+                card.classList.add('bg-white/5');
+                const iconContainer = card.querySelector('div:first-child');
+                const desc = card.querySelector('p:last-child');
+                iconContainer.classList.remove('bg-primary/20');
+                iconContainer.classList.add('bg-surface-container-high');
+                desc.classList.remove('text-primary/70');
+                desc.classList.add('text-secondary/70');
+            });
+
+            // Add selection to clicked
+            element.classList.add('role-card-selected');
+            element.classList.remove('bg-white/5');
+            const iconContainer = element.querySelector('div:first-child');
+            const desc = element.querySelector('p:last-child');
+            iconContainer.classList.add('bg-primary/20');
+            iconContainer.classList.remove('bg-surface-container-high');
+            desc.classList.add('text-primary/70');
+            desc.classList.remove('text-secondary/70');
+        }
+    </script>
+</body></html>

@@ -1,0 +1,91 @@
+<header class="top-bar">
+
+  <!-- Left: module title -->
+  <div class="tb-left">
+    <h1 class="tb-title">{{ moduleName }}</h1>
+  </div>
+
+  <!-- Right: notifications + user -->
+  <div class="tb-right">
+
+    <!-- Bell -->
+    <div class="tb-btn-wrap" (click)="toggleNotifications($event)">
+      <button class="tb-icon-btn" [class.active]="showNotifications" aria-label="Notificaciones">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="tb-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </button>
+
+      <!-- Notifications panel -->
+      <div class="tb-dropdown notifications-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+        <div class="td-header">
+          <span>Notificaciones</span>
+          <span class="td-count" *ngIf="unreadCount > 0">{{ unreadCount }} nuevas</span>
+        </div>
+        <div class="td-body">
+          <ng-container *ngIf="alertas.length > 0; else noAlerts">
+            <div
+              class="alerta-row"
+              *ngFor="let a of alertas"
+              [class.unread]="!a.leida"
+              [class.danger]="a.tipo === 'danger'"
+              [class.warn]="a.tipo === 'warn'">
+              <span class="material-symbols-outlined alerta-icon">{{ getAlertaIcon(a.modulo) }}</span>
+              <div class="alerta-text">
+                <p class="alerta-title">{{ a.titulo }}</p>
+                <p class="alerta-desc">{{ a.descripcion }}</p>
+              </div>
+              <button class="mark-btn" *ngIf="!a.leida" (click)="markAsRead(a, $event)" title="Marcar como leída">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+            </div>
+          </ng-container>
+          <ng-template #noAlerts>
+            <div class="td-empty">
+              <span class="material-symbols-outlined">check_circle</span>
+              <span>Sin alertas activas</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="tb-divider"></div>
+
+    <!-- User -->
+    <div class="tb-btn-wrap" (click)="toggleUserDropdown($event)">
+      <button class="tb-user-btn" [class.active]="showUserDropdown">
+        <div class="tb-avatar" [style.background]="profileState.avatarImage ? 'transparent' : avatarGradient">
+          <img *ngIf="profileState.avatarImage" [src]="profileState.avatarImage" class="tb-avatar-photo" alt="">
+          <span *ngIf="!profileState.avatarImage">{{ getUserInitials() }}</span>
+        </div>
+        <span class="tb-username">{{ getUserName() }}</span>
+        <span class="material-symbols-outlined tb-chevron">expand_more</span>
+      </button>
+
+      <!-- User dropdown -->
+      <div class="tb-dropdown user-dropdown" *ngIf="showUserDropdown" (click)="$event.stopPropagation()">
+        <div class="td-user-info">
+          <div class="td-avatar" [style.background]="profileState.avatarImage ? 'transparent' : avatarGradient">
+            <img *ngIf="profileState.avatarImage" [src]="profileState.avatarImage" class="td-avatar-photo" alt="">
+            <span *ngIf="!profileState.avatarImage">{{ getUserInitials() }}</span>
+          </div>
+          <div>
+            <p class="td-user-name">{{ getUserName() }}</p>
+            <p class="td-user-role">{{ getUserRole() }}</p>
+          </div>
+        </div>
+        <div class="td-sep"></div>
+        <button class="td-item" (click)="goToProfile()">
+          <span class="material-symbols-outlined">person</span>
+          <span>Mi Perfil</span>
+        </button>
+        <div class="td-sep"></div>
+        <button class="td-item td-logout" (click)="logout()">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</header>

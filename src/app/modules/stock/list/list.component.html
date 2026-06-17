@@ -1,0 +1,242 @@
+<div class="stock-container">
+  <!-- Summary Cards Section -->
+  <div class="summary-grid" *ngIf="!loading">
+    <div class="summary-card">
+      <div class="summary-icon">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <div class="summary-content">
+        <span class="summary-label">Total Repuestos</span>
+        <span class="summary-value">{{ getTotalRepuestos() }}</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon critical">
+        <mat-icon>warning</mat-icon>
+      </div>
+      <div class="summary-content">
+        <span class="summary-label">Críticos</span>
+        <span class="summary-value">{{ getCriticosCount() }}</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon">
+        <mat-icon>trending_down</mat-icon>
+      </div>
+      <div class="summary-content">
+        <span class="summary-label">Bajo Stock</span>
+        <span class="summary-value">{{ getBajoStockCount() }}</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon success">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="summary-content">
+        <span class="summary-label">Disponibles</span>
+        <span class="summary-value">{{ getDisponiblesCount() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters + Create button -->
+  <div class="stock-filters">
+    <div class="filter-chip-group">
+      <button mat-stroked-button
+              [class.active]="filterState === 'todos'"
+              (click)="setFilter('todos')">
+        <mat-icon>list</mat-icon>
+        Todos
+      </button>
+      <button mat-stroked-button
+              [class.active]="filterState === 'criticos'"
+              (click)="setFilter('criticos')">
+        <mat-icon>error</mat-icon>
+        Críticos
+      </button>
+      <button mat-stroked-button
+              [class.active]="filterState === 'bajo'"
+              (click)="setFilter('bajo')">
+        <mat-icon>trending_down</mat-icon>
+        Bajo Stock
+      </button>
+      <button mat-stroked-button
+              [class.active]="filterState === 'inactivos'"
+              (click)="setFilter('inactivos')"
+              *ngIf="currentRole === 'ADMIN'">
+        <mat-icon>archive</mat-icon>
+        Inactivos
+      </button>
+    </div>
+
+    <div class="search-bar">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input type="text"
+             class="search-input"
+             placeholder="Buscar repuestos..."
+             [(ngModel)]="searchTerm"
+             (input)="filterStock()">
+    </div>
+
+    <button
+      class="btn-create"
+      type="button"
+      title="Nuevo Repuesto"
+      (click)="onCreateClick()"
+      *ngIf="currentRole === 'ADMIN'"
+    >
+      <span>+</span>
+    </button>
+  </div>
+
+  <!-- Skeleton Loading -->
+  <div class="skeleton-table" *ngIf="loading">
+    <div *ngFor="let i of [1,2,3,4,5]" class="skeleton-row">
+      <div class="skeleton" style="width: 15%"></div>
+      <div class="skeleton" style="width: 15%"></div>
+      <div class="skeleton" style="width: 12%"></div>
+      <div class="skeleton" style="width: 20%"></div>
+      <div class="skeleton" style="width: 20%"></div>
+      <div class="skeleton" style="width: 10%"></div>
+    </div>
+  </div>
+
+  <!-- Stock Table -->
+  <div class="table-container" *ngIf="!loading && filteredStock.length > 0">
+    <table class="stock-table">
+      <thead>
+        <tr class="table-header">
+          <th class="col-nombre">Nombre</th>
+          <th class="col-categoria">Categoría</th>
+          <th class="col-precio">Precio</th>
+          <th class="col-stock">Stock Actual</th>
+          <th class="col-minimo">Stock Mínimo</th>
+          <th class="col-estado">Estado</th>
+          <th class="col-acciones" *ngIf="canEdit">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="table-row"
+            *ngFor="let repuesto of pagedStock"
+            [class.critical]="repuesto.critico && repuesto.activo !== false"
+            [class.low-stock]="repuesto.stockActual <= repuesto.stockMinimo && repuesto.activo !== false"
+            [class.row-inactivo]="repuesto.activo === false">
+          <td class="col-nombre">
+            <span class="nombre-text">{{ repuesto.nombre }}</span>
+          </td>
+          <td class="col-categoria">
+            <span class="categoria-badge">{{ repuesto.categoria }}</span>
+          </td>
+          <td class="col-precio">
+            {{ repuesto.precio | currency }}
+          </td>
+          <td class="col-stock">
+            <div class="stock-progress">
+              <div class="progress-bar">
+                <div class="progress-fill"
+                     [style.width.%]="getStockPercentage(repuesto)"></div>
+              </div>
+              <span class="stock-text">{{ repuesto.stockActual }}</span>
+            </div>
+          </td>
+          <td class="col-minimo">
+            {{ repuesto.stockMinimo }}
+          </td>
+          <td class="col-estado">
+            <span class="estado-chip" [class]="'estado-' + getEstadoClass(repuesto)">
+              {{ getEstadoLabel(repuesto) }}
+            </span>
+          </td>
+          <td class="col-acciones" *ngIf="canEdit">
+            <button class="btn-icon" (click)="editarRepuesto(repuesto)" type="button" title="Editar repuesto">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button
+              *ngIf="repuesto.activo !== false && currentRole === 'ADMIN'"
+              class="btn-icon-danger"
+              (click)="eliminarRepuesto(repuesto)"
+              type="button"
+              title="Dar de baja">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+            <button
+              *ngIf="repuesto.activo === false && currentRole === 'ADMIN'"
+              class="btn-icon-success"
+              (click)="reactivarRepuesto(repuesto)"
+              type="button"
+              title="Reactivar repuesto">
+              <span class="material-symbols-outlined">restore</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="pagination-controls">
+    <button class="pag-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <span class="pag-label">Página {{ currentPage }} de {{ totalPages }}</span>
+    <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+    <span class="pag-count">{{ pageStart }}–{{ pageEnd }} de {{ filteredStock.length }}</span>
+  </div>
+
+  <!-- Empty State: sin repuestos en el sistema -->
+  <div class="empty-state" *ngIf="!loading && filteredStock.length === 0 && allRepuestos.length === 0">
+    <mat-icon>inventory_2</mat-icon>
+    <h3>No hay repuestos</h3>
+    <p>Comienza agregando tu primer repuesto al inventario</p>
+    <button class="btn-empty-create" type="button" (click)="onCreateClick()" *ngIf="currentRole === 'ADMIN'">
+      <mat-icon>add</mat-icon>
+      Crear Primer Repuesto
+    </button>
+  </div>
+
+  <!-- Empty State: filtros activos sin resultados -->
+  <div class="empty-state" *ngIf="!loading && filteredStock.length === 0 && allRepuestos.length > 0">
+    <mat-icon *ngIf="searchTerm.trim()">search_off</mat-icon>
+    <mat-icon *ngIf="!searchTerm.trim() && filterState === 'criticos'">warning</mat-icon>
+    <mat-icon *ngIf="!searchTerm.trim() && filterState === 'bajo'">trending_down</mat-icon>
+    <mat-icon *ngIf="!searchTerm.trim() && filterState === 'inactivos'">archive</mat-icon>
+
+    <h3 *ngIf="searchTerm.trim()">No hay coincidencias</h3>
+    <h3 *ngIf="!searchTerm.trim() && filterState === 'criticos'">No hay repuestos en estado crítico</h3>
+    <h3 *ngIf="!searchTerm.trim() && filterState === 'bajo'">No hay repuestos en bajo stock</h3>
+    <h3 *ngIf="!searchTerm.trim() && filterState === 'inactivos'">No hay repuestos inactivos</h3>
+
+    <p *ngIf="searchTerm.trim()">Intentá con otro nombre o categoría</p>
+    <p *ngIf="!searchTerm.trim() && filterState === 'criticos'">Todos los repuestos tienen stock suficiente</p>
+    <p *ngIf="!searchTerm.trim() && filterState === 'bajo'">Todos los repuestos están por encima del mínimo</p>
+    <p *ngIf="!searchTerm.trim() && filterState === 'inactivos'">No se han dado de baja repuestos aún</p>
+  </div>
+</div>
+
+<app-repuesto-dialog
+  [isOpen]="showEditDialog"
+  [repuesto]="repuestoToEdit"
+  (closed)="onDialogClosed($event)"
+></app-repuesto-dialog>
+
+<!-- Delete Repuesto Modal -->
+<dialog #deleteRepuestoDialog class="confirm-dialog" (click)="cancelDeleteRepuesto()" (cancel)="cancelDeleteRepuesto()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="material-symbols-outlined modal-icon">archive</span>
+      <h2 class="modal-title">¿Dar de baja el repuesto?</h2>
+    </div>
+    <div class="modal-body">
+      <p>Se dará de baja <strong>{{ repuestoToDelete?.nombre }}</strong>. Dejará de aparecer en el inventario pero su historial en órdenes anteriores se conservará.</p>
+    </div>
+    <div class="modal-footer">
+      <button (click)="cancelDeleteRepuesto()" class="btn-secondary" type="button">Cancelar</button>
+      <button (click)="confirmDeleteRepuesto()" class="btn-danger" type="button">Dar de baja</button>
+    </div>
+  </div>
+</dialog>

@@ -1,0 +1,210 @@
+<div class="create-container page-enter">
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+    <div class="form-card">
+    <!-- Section 1: Personal Information -->
+    <section class="form-section">
+      <h2 class="section-title">Información Personal</h2>
+      
+      <div class="form-grid">
+        <!-- Left column -->
+        <div class="form-column">
+          <!-- Nombre field -->
+          <div class="form-field">
+            <label for="nombre" class="field-label">
+              Nombre completo <span class="required">*</span>
+            </label>
+            <input 
+              type="text"
+              id="nombre"
+              class="ts-input"
+              formControlName="nombre"
+              placeholder="Ej: Juan García"
+              [class.error]="nombreControl?.invalid && nombreControl?.touched"
+            />
+            <div class="error-text" *ngIf="nombreControl?.invalid && nombreControl?.touched">
+              El nombre es requerido
+            </div>
+          </div>
+
+          <!-- Email field -->
+          <div class="form-field">
+            <label for="email" class="field-label">
+              Email
+            </label>
+            <input 
+              type="email"
+              id="email"
+              class="ts-input"
+              formControlName="email"
+              placeholder="cliente@example.com"
+              [class.error]="emailControl?.invalid && emailControl?.touched"
+            />
+            <div class="error-text" *ngIf="emailControl?.invalid && emailControl?.touched">
+              Email no válido
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="form-column">
+          <!-- Teléfono field -->
+          <div class="form-field">
+            <label for="telefono" class="field-label">
+              Teléfono
+            </label>
+            <input 
+              type="tel"
+              id="telefono"
+              class="ts-input"
+              formControlName="telefono"
+              placeholder="+54 9 11 2345-6789"
+            />
+          </div>
+
+          <!-- Dirección field -->
+          <div class="form-field form-field-full">
+            <label for="direccion" class="field-label">
+              Dirección
+            </label>
+            <textarea 
+              id="direccion"
+              class="ts-input"
+              formControlName="direccion"
+              placeholder="Calle, número, ciudad..."
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Equipment Type Selector -->
+    <section class="form-section">
+      <h2 class="section-title">Tipo de Equipo (Opcional)</h2>
+      
+      <div class="equipment-selector">
+        <button 
+          type="button"
+          class="selection-card"
+          [class.active]="selectedEquipmentType === 'Smartphone'"
+          (click)="selectType('Smartphone')"
+        >
+          <span class="material-symbols-outlined">smartphone</span>
+          <span>Smartphone</span>
+        </button>
+
+        <button 
+          type="button"
+          class="selection-card"
+          [class.active]="selectedEquipmentType === 'Laptop'"
+          (click)="selectType('Laptop')"
+        >
+          <span class="material-symbols-outlined">laptop_mac</span>
+          <span>Laptop</span>
+        </button>
+
+        <button 
+          type="button"
+          class="selection-card"
+          [class.active]="selectedEquipmentType === 'Desktop'"
+          (click)="selectType('Desktop')"
+        >
+          <span class="material-symbols-outlined">computer</span>
+          <span>Desktop</span>
+        </button>
+
+        <button 
+          type="button"
+          class="selection-card"
+          [class.active]="selectedEquipmentType === 'Other'"
+          (click)="selectType('Other')"
+        >
+          <span class="material-symbols-outlined">build</span>
+          <span>Other</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Section 3: Equipment Description -->
+    <section class="form-section" *ngIf="selectedEquipmentType" style="animation: fadeSlideIn 350ms cubic-bezier(0.4, 0, 0.2, 1) both;">
+      <h2 class="section-title">Descripción del Equipo</h2>
+      
+      <div class="form-grid-2">
+        <div class="form-field">
+          <label for="marca" class="field-label">
+            Marca
+          </label>
+          <input 
+            type="text"
+            id="marca"
+            class="ts-input"
+            formControlName="marca"
+            placeholder="ej: Apple, Dell, Samsung"
+          />
+        </div>
+        <div class="form-field">
+          <label for="modelo" class="field-label">
+            Modelo
+          </label>
+          <input 
+            type="text"
+            id="modelo"
+            class="ts-input"
+            formControlName="modelo"
+            placeholder="ej: ThinkPad E15, iPhone 14"
+          />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="numeroSerie" class="field-label">
+          Número de Serie
+        </label>
+        <input 
+          type="text"
+          id="numeroSerie"
+          class="ts-input"
+          formControlName="numeroSerie"
+          placeholder="ej: SN-9920384752"
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="observaciones" class="field-label">
+          Observaciones
+        </label>
+        <textarea 
+          id="observaciones"
+          class="ts-input"
+          formControlName="observaciones"
+          placeholder="Notas adicionales sobre el equipo"
+          rows="4"
+        ></textarea>
+      </div>
+    </section>
+
+    <!-- Form actions -->
+    <div class="form-actions">
+      <button 
+        type="button"
+        class="btn-cancel"
+        (click)="onCancel()"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="submit"
+        class="ts-btn-primary"
+        [disabled]="form.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Guardar Cliente</span>
+        <span *ngIf="isLoading" class="loading-state">
+          <span class="material-symbols-outlined loading-icon">hourglass_empty</span>
+          Guardando...
+        </span>
+      </button>
+    </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,224 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: #141824;
+  border: 1px solid rgba(222, 225, 247, 0.08);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(222, 225, 247, 0.08);
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.btn-close {
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.modal-form {
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.required {
+  color: #ff6b6b;
+}
+
+.ts-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 245, 212, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(0, 245, 212, 0.4);
+    box-shadow: 0 0 0 3px rgba(0, 245, 212, 0.05);
+  }
+
+  &.error {
+    border-color: #ef4444;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.05);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.error-text {
+  font-size: 12px;
+  color: #ef4444;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid rgba(222, 225, 247, 0.08);
+  flex-shrink: 0;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-save {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  background: #00f5d4;
+  color: #0a0f1e;
+
+  mat-spinner {
+    display: inline-block;
+  }
+
+  &:hover:not(:disabled) {
+    background: #00e0ba;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
