@@ -1,127 +1,164 @@
 <div class="login-wrapper">
-  <!-- Decorative background -->
   <div class="login-background"></div>
 
-  <!-- Main Content -->
-  <main class="login-container">
-    <!-- Logo Section -->
-    <div class="login-logo-section">
-      <div class="logo-icon">
-        <span class="material-symbols-outlined">build</span>
-      </div>
-      <h1 class="logo-title">TallerSoft</h1>
-      <p class="logo-subtitle">Sistema de Gestión ERP</p>
-    </div>
+  <div class="login-page-layout">
 
-    <!-- Login Card -->
-    <div class="ts-card login-card">
-      <!-- Decorative atmospheric glow -->
-      <div class="card-glow"></div>
-
-      <div class="card-content">
-        <!-- Header -->
-        <header class="card-header">
-          <h2 class="card-title">Bienvenido</h2>
-          <p class="card-description">Inicie sesión para acceder al panel de control.</p>
-        </header>
-
-        <!-- Error Alert -->
-        <div *ngIf="errorMessage" class="error-alert" role="alert">
-          <span class="material-symbols-outlined">error</span>
-          <span class="error-text">{{ errorMessage }}</span>
+    <!-- Login Column -->
+    <main class="login-container">
+      <div class="login-logo-section">
+        <div class="logo-icon">
+          <span class="material-symbols-outlined">build</span>
         </div>
+        <h1 class="logo-title">TallerSoft</h1>
+        <p class="logo-subtitle">Sistema de Gestión ERP</p>
+      </div>
 
-        <!-- Form -->
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-          <!-- Email Field -->
-          <div class="form-group">
-            <label class="form-label" for="email">Correo Electrónico</label>
-            <div class="form-input-wrapper">
-              <span class="input-icon">
-                <span class="material-symbols-outlined">mail</span>
-              </span>
-              <input
-                id="email"
-                type="email"
-                class="ts-input"
-                formControlName="email"
-                placeholder="admin@tallersoft.com"
-                autocomplete="email"
-              />
-            </div>
+      <div class="ts-card login-card">
+        <div class="card-glow"></div>
+
+        <div class="card-content">
+          <header class="card-header">
+            <h2 class="card-title">Bienvenido</h2>
+            <p class="card-description">Inicie sesión para acceder al panel de control.</p>
+          </header>
+
+          <div *ngIf="errorMessage" class="error-alert" role="alert">
+            <span class="material-symbols-outlined">error</span>
+            <span class="error-text">{{ errorMessage }}</span>
           </div>
 
-          <!-- Password Field -->
-          <div class="form-group">
-            <label class="form-label" for="password">Contraseña</label>
-            <div class="form-input-wrapper">
-              <span class="input-icon">
-                <span class="material-symbols-outlined">lock</span>
-              </span>
-              <input
-                id="password"
-                [type]="showPassword ? 'text' : 'password'"
-                class="ts-input"
-                formControlName="password"
-                placeholder="••••••••"
-                autocomplete="current-password"
-              />
-              <button
-                type="button"
-                class="password-toggle"
-                (click)="togglePasswordVisibility()"
-                [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-              >
-                <span class="material-symbols-outlined">
-                  {{ showPassword ? 'visibility_off' : 'visibility' }}
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+            <div class="form-group">
+              <label class="form-label" for="email">Correo Electrónico</label>
+              <div class="form-input-wrapper">
+                <span class="input-icon">
+                  <span class="material-symbols-outlined">mail</span>
                 </span>
-              </button>
+                <input
+                  id="email"
+                  type="email"
+                  class="ts-input"
+                  formControlName="email"
+                  placeholder="admin@tallersoft.com"
+                  autocomplete="email"
+                />
+              </div>
             </div>
-          </div>
 
-          <!-- Remember Session Checkbox -->
-          <div class="form-checkbox">
-            <input type="checkbox" id="remember" />
-            <label for="remember" class="checkbox-label">Recordar sesión</label>
-          </div>
+            <div class="form-group">
+              <label class="form-label" for="password">Contraseña</label>
+              <div class="form-input-wrapper">
+                <span class="input-icon">
+                  <span class="material-symbols-outlined">lock</span>
+                </span>
+                <input
+                  id="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  class="ts-input"
+                  formControlName="password"
+                  placeholder="••••••••"
+                  autocomplete="current-password"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="togglePasswordVisibility()"
+                  [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                >
+                  <span class="material-symbols-outlined">
+                    {{ showPassword ? 'visibility_off' : 'visibility' }}
+                  </span>
+                </button>
+              </div>
+            </div>
 
-          <!-- Submit Button -->
-          <button
-            type="submit"
-            class="ts-btn-primary login-button"
-            [disabled]="loginForm.invalid || loading"
-          >
-            <span *ngIf="!loading" class="button-text">
-              INGRESAR
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </span>
-            <span *ngIf="loading" class="button-loading">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </span>
-          </button>
-        </form>
+            <div class="form-checkbox">
+              <input type="checkbox" id="remember" />
+              <label for="remember" class="checkbox-label">Recordar sesión</label>
+            </div>
 
-        <!-- Footer -->
-        <footer class="card-footer">
-          <p class="footer-text">
-            ¿No tiene una cuenta?
-            <span class="footer-link">Contactar Soporte</span>
-          </p>
-        </footer>
+            <button
+              type="submit"
+              class="ts-btn-primary login-button"
+              [disabled]="loginForm.invalid || loading"
+            >
+              <span *ngIf="!loading" class="button-text">
+                INGRESAR
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </span>
+              <span *ngIf="loading" class="button-loading">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="quick-login-button"
+              [disabled]="loading"
+              (click)="quickLogin()"
+            >
+              <span class="material-symbols-outlined">bolt</span>
+              Inicio Rápido
+            </button>
+          </form>
+
+          <footer class="card-footer">
+            <p class="footer-text">
+              ¿No tiene una cuenta?
+              <span class="footer-link">Contactar Soporte</span>
+            </p>
+          </footer>
+        </div>
       </div>
-    </div>
 
-    <!-- System Status -->
-    <div class="status-bar">
-      <div class="status-item">
-        <span class="status-dot"></span>
-        <span class="status-text">SERVIDOR: ONLINE</span>
+      <div class="status-bar">
+        <div class="status-item">
+          <span class="status-dot"></span>
+          <span class="status-text">SERVIDOR: ONLINE</span>
+        </div>
+        <div class="status-divider"></div>
+        <span class="status-text">v2.4.0-STABLE</span>
       </div>
-      <div class="status-divider"></div>
-      <span class="status-text">v2.4.0-STABLE</span>
-    </div>
-  </main>
+    </main>
+
+    <!-- Demo Accounts Panel -->
+    <aside class="demo-panel">
+      <div class="demo-panel-header">
+        <span class="material-symbols-outlined">badge</span>
+        <span>Accesos de Demo</span>
+      </div>
+      <p class="demo-panel-desc">
+        Hacé clic en una cuenta para ingresar directamente.
+      </p>
+
+      <div class="demo-accounts">
+        <div
+          *ngFor="let account of demoAccounts"
+          class="demo-account"
+          (click)="quickLogin(account.email, account.password)"
+        >
+          <div class="demo-account-icon">
+            <span class="material-symbols-outlined">{{ account.icon }}</span>
+          </div>
+          <div class="demo-account-info">
+            <div class="demo-account-top">
+              <span class="demo-account-rol">{{ account.rol }}</span>
+            </div>
+            <span class="demo-account-email">{{ account.email }}</span>
+            <span class="demo-account-pass">Contraseña: {{ account.password }}</span>
+            <span class="demo-account-desc">{{ account.desc }}</span>
+          </div>
+          <span class="material-symbols-outlined demo-account-arrow">arrow_forward</span>
+        </div>
+      </div>
+
+      <p class="demo-panel-note">
+        <span class="material-symbols-outlined">info</span>
+        Entorno de demostración — los datos son simulados.
+      </p>
+    </aside>
+
+  </div>
 </div>
-

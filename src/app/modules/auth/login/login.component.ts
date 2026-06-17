@@ -37,6 +37,12 @@ export class LoginComponent implements OnInit {
   showPassword = false;
   errorMessage: string | null = null;
 
+  demoAccounts = [
+    { rol: 'ADMIN',     icon: 'admin_panel_settings', email: 'admin@tallersoft.com',  password: 'admin123',   desc: 'Acceso completo al sistema' },
+    { rol: 'TÉCNICO',   icon: 'build',                email: 'carlos@tallersoft.com', password: 'tecnico123', desc: 'Gestión de órdenes de trabajo' },
+    { rol: 'RECEPCIÓN', icon: 'support_agent',        email: 'laura@tallersoft.com',  password: 'recep123',   desc: 'Atención al cliente y cobros' },
+  ];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -90,6 +96,11 @@ export class LoginComponent implements OnInit {
         this.errorMessage = error.error?.message || 'Email o contraseña incorrectos';
       }
     });
+  }
+
+  quickLogin(email = 'admin@tallersoft.com', password = 'admin123'): void {
+    this.loginForm.setValue({ email, password });
+    this.onSubmit();
   }
 
   togglePasswordVisibility(): void {
