@@ -7,6 +7,7 @@
     "mock": "node mock-server.js",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
+    "build:netlify": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
@@ -15,6 +16,9 @@
   },
   "private": true,
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "serverless-http": "^3.2.0",
     "@angular/animations": "^18.2.14",
     "@angular/cdk": "^18.2.14",
     "@angular/common": "^18.2.14",
